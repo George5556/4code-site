@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4CODE — Разработка сайтов для бизнеса и услуг с живым прототипом до оплаты</title>
+  <meta
+    name="description"
+    content="Веб-студия 4CODE: лендинги и сайты для автосервисов, шиномонтажа и локального бизнеса. 100% адаптация под телефоны, заявки в Telegram и запуск за 3–7 дней."
+  />
+  <meta name="theme-color" content="#0E0E10" />
+
+  <!-- Минималистичный SVG-фавикон 4CODE -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0E10'/%3E%3Crect x='0.5' y='0.5' width='31' height='31' rx='5.5' stroke='%2326262C'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='18' fill='%23FF5500'%3E4%3C/text%3E%3C/svg%3E"
+  />
+
+  <!-- Google Fonts: Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0E0E10',
+            surface: '#16161A',
+            border: '#26262C',
+            accent: '#FF5500',
+            'accent-hover': '#E04B00',
+            muted: '#A1A1AA',
+          },
+          fontFamily: {
+            sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    body {
+      background-color: #0E0E10;
+      color: #FFFFFF;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    section[id] {
+      scroll-margin-top: 84px;
+    }
+
+    /* =====================================================================
+       АРХИТЕКТУРНАЯ СЕТКА И ЛУЧИ ПО ЛИНИЯМ (HERO)
+       ===================================================================== */
+    .hero-grid {
+      background-image:
+        linear-gradient(to right, rgba(38, 38, 44, 0.42) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(38, 38, 44, 0.42) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 85% 75% at 50% 30%, #000 35%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 30%, #000 35%, transparent 100%);
+    }
+
+    .grid-beam-h {
+      position: absolute;
+      left: 0;
+      height: 1px;
+      width: 140px;
+      background: linear-gradient(90deg, transparent, rgba(255, 85, 0, 0.7), transparent);
+      animation: beamSlideH 9s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    .grid-beam-v {
+      position: absolute;
+      top: 0;
+      width: 1px;
+      height: 120px;
+      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+      animation: beamSlideV 11s linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes beamSlideH {
+      0% { transform: translateX(-180px); opacity: 0; }
+      12% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateX(110vw); opacity: 0; }
+    }
+
+    @keyframes beamSlideV {
+      0% { transform: translateY(-160px); opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(720px); opacity: 0; }
+    }
+
+    /* =====================================================================
+       КИНЕТИЧЕСКОЕ ПОЯВЛЕНИЕ HERO (MASKED REVEAL)
+       ===================================================================== */
+    .hero-enter {
+      opacity: 0;
+      transform: translate3d(0, 26px, 0);
+      filter: blur(4px);
+      animation: heroEnter 0.85s var(--ease-expo) forwards;
+      animation-delay: var(--delay, 0ms);
+      will-change: transform, opacity, filter;
+    }
+
+    @keyframes heroEnter {
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    .hero-mask-line {
+      display: block;
+      overflow: hidden;
+      padding-block: 0.04em;
+    }
+
+    .hero-mask-line.is-settled {
+      overflow: visible;
+    }
+
+    .hero-mask-line > span {
+      display: inline-block;
+      transform: translate3d(0, 108%, 0);
+      animation: lineRise 0.9s var(--ease-expo) forwards;
+      animation-delay: var(--delay, 80ms);
+      will-change: transform;
+    }
+
+    @keyframes lineRise {
+      to {
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    /* Живой пульс индикаторов */
+    @keyframes statusPing {
+      0% { transform: scale(1); opacity: 0.75; }
+      70%, 100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    .status-ping {
+      position: relative;
+    }
+
+    .status-ping::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: #FF5500;
+      animation: statusPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    /* =====================================================================
+       БЕГУЩАЯ СТРОКА (KINETIC TICKER)
+       ===================================================================== */
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: tickerLoop 28s linear infinite;
+      will-change: transform;
+    }
+
+    .ticker-wrap:hover .ticker-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes tickerLoop {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-50%, 0, 0); }
+    }
+
+    /* =====================================================================
+       SPOTLIGHT НА 1PX ГРАНИЦАХ КАРТОЧЕК (ПОЗИЦИЯ КУРСОРА)
+       ===================================================================== */
+    .spotlight-card {
+      position: relative;
+      --mx: -999px;
+      --my: -999px;
+    }
+
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: radial-gradient(
+        420px circle at var(--mx) var(--my),
+        rgba(255, 85, 0, 0.08),
+        transparent 65%
+      );
+      z-index: 0;
+    }
+
+    .spotlight-card::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: radial-gradient(
+        260px circle at var(--mx) var(--my),
+        rgba(255, 85, 0, 0.72),
+        rgba(255, 255, 255, 0.16) 45%,
+        transparent 75%
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      z-index: 2;
+    }
+
+    .spotlight-card:hover::before,
+    .spotlight-card:hover::after {
+      opacity: 1;
+    }
+
+    .spotlight-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =====================================================================
+       МАГНИТНЫЕ КНОПКИ И БЛИК (SHEEN)
+       ===================================================================== */
+    .btn-kinetic {
+      position: relative;
+      overflow: hidden;
+      transition:
+        transform 0.32s var(--ease-expo),
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+      will-change: transform;
+    }
+
+    .btn-kinetic::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 75%;
+      height: 100%;
+      background: linear-gradient(
+        110deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.22) 50%,
+        transparent 80%
+      );
+      transition: transform 0.65s var(--ease-expo);
+      pointer-events: none;
+    }
+
+    .btn-kinetic:hover::before {
+      transform: translateX(300%);
+    }
+
+    /* =====================================================================
+       3D-ПЕРСПЕКТИВА HERO-МАКЕТА
+       ===================================================================== */
+    .mockup-stage {
+      perspective: 1200px;
+    }
+
+    .mockup-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .mockup-frame-inner {
+      transition: max-width 0.48s var(--ease-expo);
+    }
+
+    /* Анимация тоста Telegram в макете */
+    @keyframes toastPop {
+      0% { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.97); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+
+    .toast-pop {
+      animation: toastPop 0.38s var(--ease-spring) forwards;
+    }
+
+    /* =====================================================================
+       SCROLL REVEAL С КАСКАДНОЙ ХОРЕОГРАФИЕЙ
+       ===================================================================== */
+    .reveal-ready [data-reveal] {
+      opacity: 0;
+      transform: translate3d(0, 24px, 0);
+      transition:
+        opacity 0.72s var(--ease-expo),
+        transform 0.72s var(--ease-expo);
+      transition-delay: var(--reveal-delay, 0ms);
+      will-change: opacity, transform;
+    }
+
+    .reveal-ready [data-reveal="scale"] {
+      transform: translate3d(0, 18px, 0) scale(0.975);
+    }
+
+    .reveal-ready [data-reveal].is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    /* Линия прогресса шагов 01–04 */
+    .process-beam {
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 1.15s var(--ease-expo);
+    }
+
+    .process-beam.is-active {
+      transform: scaleX(1);
+    }
+
+    /* =====================================================================
+       FAQ АККОРДЕОН С ПРУЖИННОЙ ИКОНКОЙ
+       ===================================================================== */
+    .faq-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.36s var(--ease-expo);
+    }
+
+    .faq-item[data-open="true"] .faq-content {
+      grid-template-rows: 1fr;
+    }
+
+    .faq-inner {
+      overflow: hidden;
+    }
+
+    .faq-answer {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.3s ease, transform 0.35s var(--ease-expo);
+    }
+
+    .faq-item[data-open="true"] .faq-answer {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .faq-icon {
+      transition: transform 0.38s var(--ease-spring), border-color 0.25s ease;
+    }
+
+    .faq-item[data-open="true"] .faq-icon {
+      transform: rotate(45deg);
+      border-color: rgba(255, 85, 0, 0.55);
+    }
+
+    /* Анимация галочки при успешной отправке формы */
+    .check-draw path {
+      stroke-dasharray: 28;
+      stroke-dashoffset: 28;
+    }
+
+    .check-draw.is-drawn path {
+      animation: drawCheck 0.55s var(--ease-expo) 0.1s forwards;
+    }
+
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Уважение настройки уменьшенного движения */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .hero-enter,
+      .hero-mask-line > span,
+      .reveal-ready [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+      }
+      .ticker-track {
+        animation: none !important;
+      }
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    /* Стилизация скроллбара */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0E0E10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #26262C;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3A3A44;
+    }
+  </style>
+</head>
+<body class="bg-bg text-white selection:bg-accent selection:text-white overflow-x-hidden">
+
+  <!-- =====================================================================
+       1. ЗАКРЕПЛЁННАЯ ШАПКА (HEADER) + SCROLL PROGRESS LINE
+       ===================================================================== -->
+  <header id="site-header" class="sticky top-0 z-50 border-b border-border bg-bg/85 backdrop-blur-md transition-colors duration-300">
+    <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:h-[72px] lg:px-8">
+
+      <!-- Логотип 4CODE -->
+      <a
+        href="#"
+        class="group inline-flex items-center text-xl font-extrabold tracking-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+        aria-label="4CODE — На главную"
+      >
+        <span class="text-accent transition-transform duration-300 group-hover:-translate-y-0.5">4</span><span class="text-white">CODE</span>
+      </a>
+
+      <!-- Навигация (Desktop) -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-muted" aria-label="Основная навигация">
+        <a href="#about" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">О студии</a>
+        <a href="#cases" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Примеры работ</a>
+        <a href="#process" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Как работаем</a>
+        <a href="#pricing" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Тарифы</a>
+        <a href="#faq" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Вопросы</a>
+      </nav>
+
+      <!-- Правая часть: CTA + бургер-меню -->
+      <div class="flex items-center gap-3">
+        <a
+          href="#contact"
+          class="btn-kinetic magnetic-btn hidden sm:inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+        >
+          Контакты и Авито
+        </a>
+
+        <!-- Кнопка мобильного меню -->
+        <button
+          id="mobile-menu-toggle"
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-white transition-colors hover:border-muted md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg id="burger-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          <svg id="close-icon" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Прогресс-бар прокрутки -->
+    <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] bg-transparent">
+      <div id="scroll-progress" class="h-full w-full origin-left scale-x-0 bg-accent"></div>
+    </div>
+
+    <!-- Выпадающее мобильное меню -->
+    <div id="mobile-menu" class="hidden border-t border-border bg-bg md:hidden">
+      <nav class="mx-auto flex max-w-6xl flex-col px-4 py-4 space-y-1" aria-label="Мобильная навигация">
+        <a href="#about" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+          О студии
+        </a>
+        <a href="#cases" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+          Примеры работ
+        </a>
+        <a href="#process" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+          Как работаем
+        </a>
+        <a href="#pricing" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+          Тарифы
+        </a>
+        <a href="#faq" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+          Вопросы
+        </a>
+        <div class="pt-3">
+          <a
+            href="#contact"
+            class="mobile-nav-link flex w-full items-center justify-center rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+          >
+            Контакты и Авито
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- =====================================================================
+         2. ПЕРВЫЙ ЭКРАН (HERO)
+         ===================================================================== -->
+    <section class="relative overflow-hidden border-b border-border pt-12 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
+      <!-- Архитектурная сетка + скользящие 1px лучи вдоль линий сетки -->
+      <div class="hero-grid pointer-events-none absolute inset-0" aria-hidden="true">
+        <span class="grid-beam-h" style="top: 128px; animation-delay: 0s;"></span>
+        <span class="grid-beam-h" style="top: 384px; animation-delay: 4.2s;"></span>
+        <span class="grid-beam-v" style="left: 256px; animation-delay: 1.5s;"></span>
+        <span class="grid-beam-v" style="left: 768px; animation-delay: 5.8s;"></span>
+      </div>
+
+      <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
+
+          <!-- Левая колонка: хореографированное появление текста -->
+          <div class="lg:col-span-7">
+            <!-- Бейдж -->
+            <div class="hero-enter inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-medium text-muted sm:text-sm" style="--delay: 40ms;">
+              <span class="status-ping h-2 w-2 rounded-full bg-accent"></span>
+              <span>Разработка сайтов для бизнеса и услуг</span>
+            </div>
+
+            <!-- Заголовок с masked line reveal -->
+            <h1 class="mt-6 text-3xl font-extrabold leading-[1.28] tracking-tight text-white sm:text-5xl sm:leading-[1.24] lg:text-[50px] lg:leading-[1.24]">
+              <span class="hero-mask-line"><span style="--delay: 110ms;">Делаем сайты, которые</span></span>
+              <span class="hero-mask-line"><span style="--delay: 190ms;">приносят заявки. Показываем</span></span>
+              <span class="hero-mask-line"><span style="--delay: 270ms;"><span class="text-accent">живой прототип</span> до оплаты.</span></span>
+            </h1>
+
+            <!-- Подзаголовок -->
+            <p class="hero-enter mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg" style="--delay: 340ms;">
+              Лендинги и сайты для автосервисов, шиномонтажа и локального бизнеса. 100% адаптация под телефоны, приём заявок в Telegram и запуск за 3–7 дней.
+            </p>
+
+            <!-- Кнопки действий -->
+            <div class="hero-enter mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4" style="--delay: 420ms;">
+              <a
+                href="#contact"
+                class="btn-kinetic magnetic-btn group inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3.5 text-sm font-semibold text-white hover:bg-accent-hover sm:text-base"
+              >
+                <span>Написать нам</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </a>
+              <a
+                href="#cases"
+                class="btn-kinetic inline-flex items-center justify-center rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-muted sm:text-base"
+              >
+                Смотреть живые примеры
+              </a>
+            </div>
+
+            <!-- Мини-факты с счётчиками -->
+            <div class="hero-enter mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-6 text-xs text-muted sm:text-sm" style="--delay: 500ms;">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white tabular-nums">0 ₽</span>
+                <span>за первый прототип</span>
+              </div>
+              <span class="hidden h-3 w-px bg-border sm:inline-block" aria-hidden="true"></span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white tabular-nums">3–7 дней</span>
+                <span>до запуска</span>
+              </div>
+              <span class="hidden h-3 w-px bg-border sm:inline-block" aria-hidden="true"></span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white">Telegram</span>
+                <span>мгновенные заявки</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Правая колонка: 3D-макет интерфейса с переключателем Desktop/Mobile и живым пересчётом -->
+          <div class="lg:col-span-5 hero-enter mockup-stage" style="--delay: 260ms;">
+            <div id="hero-mockup-card" class="mockup-card spotlight-card rounded-2xl border border-border bg-surface p-2 shadow-2xl shadow-black/70">
+              <!-- Верхняя панель браузера + переключатель экрана -->
+              <div class="flex items-center justify-between rounded-t-xl border-b border-border bg-bg px-3.5 py-2.5">
+                <div class="flex items-center gap-1.5" aria-hidden="true">
+                  <span class="h-2.5 w-2.5 rounded-full bg-border"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-border"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-border"></span>
+                </div>
+
+                <!-- Переключатель вида прототипа -->
+                <div class="inline-flex rounded-md border border-border bg-surface p-0.5 text-[10px] font-semibold">
+                  <button
+                    type="button"
+                    data-viewport="desktop"
+                    class="mockup-view-btn rounded px-2 py-0.5 bg-accent text-white transition-colors"
+                  >
+                    Desktop
+                  </button>
+                  <button
+                    type="button"
+                    data-viewport="mobile"
+                    class="mockup-view-btn rounded px-2 py-0.5 text-muted hover:text-white transition-colors"
+                  >
+                    Phone
+                  </button>
+                </div>
+
+                <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-accent">
+                  <span class="status-ping h-1.5 w-1.5 rounded-full bg-accent"></span>
+                  Live
+                </span>
+              </div>
+
+              <!-- Контент демо-интерфейса внутри макета -->
+              <div class="rounded-b-xl bg-bg p-4 sm:p-5 flex justify-center">
+                <div id="mockup-frame-inner" class="mockup-frame-inner w-full max-w-full">
+                  <!-- Мини-шапка сайта услуг -->
+                  <div class="flex items-center justify-between gap-2 border-b border-border pb-3">
+                    <div>
+                      <p class="text-[10px] uppercase tracking-wider text-muted">box24-service.ru</p>
+                      <p class="text-sm font-bold text-white">Автосервис «БОКС 24»</p>
+                    </div>
+                    <span class="shrink-0 rounded border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-white tabular-nums">
+                      09:00–21:00
+                    </span>
+                  </div>
+
+                  <!-- Интерактивный выбор услуги -->
+                  <div class="mt-4">
+                    <p class="text-xs font-medium text-muted">Выберите услугу для расчёта:</p>
+                    <div class="mt-2.5 grid grid-cols-1 gap-2" id="hero-mockup-services">
+                      <button
+                        type="button"
+                        data-service="Комплексное ТО и замена масла"
+                        data-price-num="3800"
+                        data-time="45 мин"
+                        class="hero-mock-btn flex items-center justify-between rounded-lg border border-accent bg-surface px-3.5 py-2.5 text-left transition-all duration-200"
+                      >
+                        <span class="text-xs font-semibold text-white">Комплексное ТО и масло</span>
+                        <span class="text-xs font-bold text-accent tabular-nums">3 800 ₽</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        data-service="Сезонный шиномонтаж R17"
+                        data-price-num="2600"
+                        data-time="30 мин"
+                        class="hero-mock-btn flex items-center justify-between rounded-lg border border-border bg-surface/60 px-3.5 py-2.5 text-left transition-all duration-200 hover:border-muted"
+                      >
+                        <span class="text-xs font-semibold text-white">Шиномонтаж R17 (4 колеса)</span>
+                        <span class="text-xs font-bold text-muted tabular-nums">2 600 ₽</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        data-service="Компьютерная диагностика"
+                        data-price-num="1500"
+                        data-time="25 мин"
+                        class="hero-mock-btn flex items-center justify-between rounded-lg border border-border bg-surface/60 px-3.5 py-2.5 text-left transition-all duration-200 hover:border-muted"
+                      >
+                        <span class="text-xs font-semibold text-white">Компьютерная диагностика</span>
+                        <span class="text-xs font-bold text-muted tabular-nums">1 500 ₽</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Итог + кнопка в макете -->
+                  <div class="mt-4 rounded-xl border border-border bg-surface p-3.5">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-muted">Время: <strong id="mock-time" class="text-white">45 мин</strong></span>
+                      <span id="mock-price" class="text-base font-extrabold text-white tabular-nums">3 800 ₽</span>
+                    </div>
+
+                    <button
+                      id="mock-submit-btn"
+                      type="button"
+                      class="btn-kinetic mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold text-white hover:bg-accent-hover active:scale-[0.99]"
+                    >
+                      <span>Записаться онлайн</span>
+                      <span aria-hidden="true">→</span>
+                    </button>
+
+                    <!-- Имитация уведомления в Telegram -->
+                    <div
+                      id="mock-tg-toast"
+                      class="mt-2.5 hidden items-center justify-between rounded-md border border-accent/40 bg-bg px-3 py-2 text-[11px]"
+                    >
+                      <span class="font-medium text-white">Заявка отправлена в Telegram</span>
+                      <span class="font-semibold text-accent">✓ Доставлено</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         КИНЕТИЧЕСКАЯ ЛЕНТА СТАНДАРТОВ СТУДИИ
+         ===================================================================== -->
+    <div class="ticker-wrap overflow-hidden border-b border-border bg-surface/50 py-3.5 select-none" aria-hidden="true">
+      <div class="ticker-track text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+        <div class="flex items-center gap-8 pr-8">
+          <span class="text-white">Прототип до оплаты</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span>Запуск за 3–7 дней</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span class="text-white">100% Mobile-First</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span>Заявки сразу в Telegram</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span class="text-white">Официально с чеком</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+        </div>
+        <div class="flex items-center gap-8 pr-8">
+          <span class="text-white">Прототип до оплаты</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span>Запуск за 3–7 дней</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span class="text-white">100% Mobile-First</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span>Заявки сразу в Telegram</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+          <span class="text-white">Официально с чеком</span>
+          <span class="h-1 w-1 rounded-full bg-accent"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         3. О СТУДИИ И ПРЕИМУЩЕСТВА (id="about", 4 КАРТОЧКИ)
+         ===================================================================== -->
+    <section id="about" class="border-b border-border py-16 sm:py-20 lg:py-24">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 grid gap-6 lg:grid-cols-12 lg:items-end" data-reveal>
+          <div class="lg:col-span-7">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">О студии 4CODE</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Проектируем быстрые сайты для реального бизнеса
+            </h2>
+          </div>
+          <p class="text-base leading-relaxed text-muted lg:col-span-5">
+            Мы специализируемся на сайтах для автосервисов, шиномонтажа и локальных компаний: чистый код без тяжёлых конструкторов, понятная структура и фокус на обращениях с телефона.
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5" data-reveal-group>
+
+          <!-- Преимущество 1 -->
+          <article class="spotlight-card group rounded-xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent transition-transform duration-300 group-hover:scale-105 group-hover:border-accent/50">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12z" />
+                <circle cx="12" cy="12" r="2.75" />
+              </svg>
+            </div>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Прототип до оплаты</h2>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              Сначала вы сами открываете готовый макет с телефона и только потом принимаете решение.
+            </p>
+          </article>
+
+          <!-- Преимущество 2 -->
+          <article class="spotlight-card group rounded-xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent transition-transform duration-300 group-hover:scale-105 group-hover:border-accent/50">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
+              </svg>
+            </div>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Запуск за 3–7 дней</h2>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              Без затянутых согласований на месяцы — фокус на структуре, скорости и заявках.
+            </p>
+          </article>
+
+          <!-- Преимущество 3 -->
+          <article class="spotlight-card group rounded-xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent transition-transform duration-300 group-hover:scale-105 group-hover:border-accent/50">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <rect x="7" y="2.5" width="10" height="19" rx="2" />
+                <path stroke-linecap="round" d="M11 18.5h2" />
+              </svg>
+            </div>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">100% под телефоны</h2>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              80% клиентов заходят со смартфонов, поэтому всё тестируем на мобильных экранах.
+            </p>
+          </article>
+
+          <!-- Преимущество 4 -->
+          <article class="spotlight-card group rounded-xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent transition-transform duration-300 group-hover:scale-105 group-hover:border-accent/50">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 4L3 11.2l6.6 2.2L17.5 7l-6.1 7.6 5.3 4.1L21 4z" />
+              </svg>
+            </div>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Заявки сразу в Telegram</h2>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              Форма обратной связи и уведомления подключаются напрямую в ваш мессенджер.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         4. ПОРТФОЛИО / ЖИВЫЕ ДЕМКИ (id="cases")
+         Для замены ссылок на демки поменяйте href="#DEMO_LINK_1" и href="#DEMO_LINK_2"
+         на реальные URL или задайте их в объекте STUDIO_CONFIG внизу файла.
+         ===================================================================== -->
+    <section id="cases" class="border-b border-border py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+        <!-- Заголовок секции -->
+        <div class="max-w-2xl" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Примеры работ</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Живые демки, которые можно покликать прямо сейчас
+          </h2>
+          <p class="mt-3 text-base text-muted">
+            Реальные рабочие прототипы, адаптированные под быструю загрузку и высокую конверсию на мобильных экранах.
+          </p>
+        </div>
+
+        <!-- Сетка кейсов: 4 живых демо-проекта (2x2) + блок под ваш проект -->
+        <div class="mt-12 grid gap-6 md:grid-cols-2" data-reveal-group>
+
+          <!-- КЕЙС 1: Хороший шиномонтаж -->
+          <article class="spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <a
+                href="https://george5556.github.io/tire-demos/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo1"
+                class="demo-link block overflow-hidden rounded-xl border border-border bg-bg transition-colors duration-300 group-hover:border-[#3A3A44]"
+                aria-label="Открыть демо-сайт Хороший шиномонтаж"
+              >
+                <div class="flex items-center justify-between border-b border-border px-3.5 py-2 text-[11px] text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                    Кейс #01
+                  </span>
+                  <span class="rounded border border-border px-2 py-0.5 text-white">Шиномонтаж</span>
+                </div>
+                <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
+                  <img
+                    src="case-1-preview.png?v=2"
+                    alt="Превью сайта Хороший шиномонтаж"
+                    class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Хороший шиномонтаж</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Тёмный лендинг для шиномонтажа: статус работы, быстрая запись, блок отзывов с Яндекс Карт и полная адаптация под телефоны.
+              </p>
+            </div>
+
+            <div class="mt-6 border-t border-border pt-5">
+              <a
+                href="https://george5556.github.io/tire-demos/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo1"
+                class="demo-link inline-flex items-center gap-2 text-sm font-semibold text-accent transition-colors hover:text-accent-hover"
+              >
+                <span>Открыть живую демку</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- КЕЙС 2: Салон красоты LUMI -->
+          <article class="spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <a
+                href="https://george5556.github.io/4code-demos/beauty/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo2"
+                class="demo-link block overflow-hidden rounded-xl border border-border bg-bg transition-colors duration-300 group-hover:border-[#3A3A44]"
+                aria-label="Открыть демо-сайт Салон красоты LUMI"
+              >
+                <div class="flex items-center justify-between border-b border-border px-3.5 py-2 text-[11px] text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                    Кейс #02
+                  </span>
+                  <span class="rounded border border-border px-2 py-0.5 text-white">Бьюти-салон</span>
+                </div>
+                <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
+                  <img
+                    src="case-beauty-preview.png?v=2"
+                    alt="Превью сайта Салон красоты LUMI"
+                    class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Салон красоты «LUMI»</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Онлайн-калькулятор визита, выбор мастера, блок отзывов с Яндекс Карт и интерактивная карта филиалов.
+              </p>
+            </div>
+
+            <div class="mt-6 border-t border-border pt-5">
+              <a
+                href="https://george5556.github.io/4code-demos/beauty/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo2"
+                class="demo-link inline-flex items-center gap-2 text-sm font-semibold text-accent transition-colors hover:text-accent-hover"
+              >
+                <span>Открыть живую демку</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- КЕЙС 3: Ремонт техники FIXLAB -->
+          <article class="spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <a
+                href="https://george5556.github.io/4code-demos/repair/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo3"
+                class="demo-link block overflow-hidden rounded-xl border border-border bg-bg transition-colors duration-300 group-hover:border-[#3A3A44]"
+                aria-label="Открыть демо-сайт Ремонт техники FIXLAB"
+              >
+                <div class="flex items-center justify-between border-b border-border px-3.5 py-2 text-[11px] text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                    Кейс #03
+                  </span>
+                  <span class="rounded border border-border px-2 py-0.5 text-white">Ремонт техники</span>
+                </div>
+                <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
+                  <img
+                    src="case-repair-preview.png?v=2"
+                    alt="Превью сайта Ремонт техники FIXLAB"
+                    class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Сервисный центр «FIXLAB»</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Калькулятор сметы с выбором качества деталей, этапы работы, отзывы с Яндекс Карт и карта филиалов.
+              </p>
+            </div>
+
+            <div class="mt-6 border-t border-border pt-5">
+              <a
+                href="https://george5556.github.io/4code-demos/repair/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo3"
+                class="demo-link inline-flex items-center gap-2 text-sm font-semibold text-accent transition-colors hover:text-accent-hover"
+              >
+                <span>Открыть живую демку</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- КЕЙС 4: Фитнес-клуб IRONBASE -->
+          <article class="spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <a
+                href="https://george5556.github.io/4code-demos/fitness/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo4"
+                class="demo-link block overflow-hidden rounded-xl border border-border bg-bg transition-colors duration-300 group-hover:border-[#3A3A44]"
+                aria-label="Открыть демо-сайт Фитнес-клуб IRONBASE"
+              >
+                <div class="flex items-center justify-between border-b border-border px-3.5 py-2 text-[11px] text-muted">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                    Кейс #04
+                  </span>
+                  <span class="rounded border border-border px-2 py-0.5 text-white">Фитнес-клуб</span>
+                </div>
+                <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
+                  <img
+                    src="case-fitness-preview.png?v=2"
+                    alt="Превью сайта Фитнес-клуб IRONBASE"
+                    class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+              </a>
+
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Фитнес-клуб «IRONBASE»</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Конструктор абонемента, расписание групп, отзывы резидентов с Яндекс Карт и интерактивная карта клубов.
+              </p>
+            </div>
+
+            <div class="mt-6 border-t border-border pt-5">
+              <a
+                href="https://george5556.github.io/4code-demos/fitness/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-demo-key="demo4"
+                class="demo-link inline-flex items-center gap-2 text-sm font-semibold text-accent transition-colors hover:text-accent-hover"
+              >
+                <span>Открыть живую демку</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Карточка с пунктирной рамкой под индивидуальный прототип -->
+        <article class="spotlight-card mt-6 flex flex-col justify-between gap-6 rounded-2xl border border-dashed border-border bg-bg p-6 sm:p-8 md:flex-row md:items-center transition-all duration-300 hover:border-accent/70" data-reveal>
+          <div class="max-w-2xl">
+            <div class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
+              <span class="status-ping h-1.5 w-1.5 rounded-full bg-accent"></span>
+              <span>Свободный слот на этой неделе</span>
+            </div>
+            <h3 class="mt-4 text-xl font-bold tracking-tight text-white sm:text-2xl">
+              Ваш бизнес может быть следующим
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              Соберём бесплатный живой прототип под вашу нишу и пришлём ссылку прямо в Telegram — чтобы вы сразу открыли сайт с телефона.
+            </p>
+          </div>
+          <div class="shrink-0">
+            <a
+              href="#contact"
+              class="btn-kinetic inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-accent hover:bg-accent hover:text-white md:w-auto"
+            >
+              <span>Связаться с нами</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         5. КАК МЫ РАБОТАЕМ (4 ШАГА 01–04 С КИНЕТИЧЕСКОЙ ЛИНИЕЙ)
+         ===================================================================== -->
+    <section id="process" class="border-b border-border py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+        <div class="max-w-2xl" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Процесс</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Как мы работаем
+          </h2>
+          <p class="mt-3 text-base text-muted">
+            Понятные этапы без длинных брифов на 10 страниц и бесконечных созвонов.
+          </p>
+        </div>
+
+        <div class="relative mt-12 overflow-hidden rounded-2xl border border-border bg-border">
+          <!-- Анимированная 2px линия прогресса по верхнему краю на десктопе -->
+          <div class="pointer-events-none absolute top-0 left-0 right-0 z-10 hidden h-[2px] bg-transparent lg:block">
+            <div id="process-beam" class="process-beam h-full w-full bg-accent"></div>
+          </div>
+
+          <div class="grid gap-px sm:grid-cols-2 lg:grid-cols-4" data-reveal-group>
+
+            <!-- Шаг 01 -->
+            <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
+              <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">01</span>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Короткий бриф</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                5 минут в Telegram — узнаём нишу, услуги и пожелания.
+              </p>
+            </div>
+
+            <!-- Шаг 02 -->
+            <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
+              <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">02</span>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Живой прототип</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Собираем рабочую демо-версию и кидаем ссылку на телефон.
+              </p>
+            </div>
+
+            <!-- Шаг 03 -->
+            <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
+              <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">03</span>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Правки и оплата</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Докручиваем детали под вас, работаем официально с чеком.
+              </p>
+            </div>
+
+            <!-- Шаг 04 -->
+            <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
+              <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">04</span>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Запуск и передача</h3>
+              <p class="mt-2.5 text-sm leading-relaxed text-muted">
+                Подключаем домен, настраиваем заявки и передаём готовый сайт.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         6. ТАРИФЫ (id="pricing", 2 КАРТОЧКИ)
+         Цены легко менять здесь в разметке или через STUDIO_CONFIG.PRICES
+         ===================================================================== -->
+    <section id="pricing" class="border-b border-border py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+        <div class="max-w-2xl" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Тарифы</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Прозрачная стоимость без скрытых доплат
+          </h2>
+          <p class="mt-3 text-base text-muted">
+            Итоговая цена фиксируется после показа бесплатного прототипа и согласования объёма.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-reveal-group>
+
+          <!-- Тариф 1: Site Lite -->
+          <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Site Lite</h3>
+                <span class="rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
+                  1–2 дня
+                </span>
+              </div>
+
+              <!-- ЦЕНА ТАРИФА SITE LITE -->
+              <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
+                <span id="price-lite" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 4 000 ₽</span>
+              </div>
+
+              <ul class="mt-6 space-y-3 text-sm text-muted">
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Максимально лёгкий и простой сайт-визитка</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Описание услуг, прайс и информация о компании</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Все контакты и ссылки (Telegram, Авито, карты)</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>100% адаптация под телефоны и быстрая загрузка</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Срок разработки и запуска — 1–2 дня</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-2.5 pt-2 sm:flex-row lg:flex-col">
+              <a
+                href="https://web.telegram.org/k/#@S4code_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
+              >
+                <span>Написать в Telegram</span>
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href="#contact"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+              >
+                Авито и контакты
+              </a>
+            </div>
+          </article>
+
+          <!-- Тариф 2: Быстрый лендинг -->
+          <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Быстрый лендинг</h3>
+                <span class="rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
+                  3–4 дня
+                </span>
+              </div>
+
+              <!-- ЦЕНА ТАРИФА 2 -->
+              <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
+                <span id="price-landing" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 8 000 ₽</span>
+              </div>
+
+              <ul class="mt-6 space-y-3 text-sm text-muted">
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Одностраничный сайт под конкретную услугу</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>100% адаптация под телефоны и планшеты</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Подключение заявок и уведомлений в Telegram</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Срок разработки и запуска — 3–4 дня</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-2.5 pt-2 sm:flex-row lg:flex-col">
+              <a
+                href="https://web.telegram.org/k/#@S4code_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
+              >
+                <span>Написать в Telegram</span>
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href="#contact"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+              >
+                Авито и контакты
+              </a>
+            </div>
+          </article>
+
+          <!-- Тариф 3: Сайт для бизнеса (Популярный) -->
+          <article class="spotlight-card relative flex flex-col justify-between rounded-2xl border border-accent bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1 md:col-span-2 lg:col-span-1" data-reveal="scale">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl lg:text-xl xl:text-2xl">Сайт для бизнеса</h3>
+                <span class="shrink-0 whitespace-nowrap rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
+                  5–7 дней
+                </span>
+              </div>
+              <div class="mt-2.5">
+                <span class="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
+                  Популярный
+                </span>
+              </div>
+
+              <!-- ЦЕНА ТАРИФА 3 -->
+              <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
+                <span id="price-business" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 13 000 ₽</span>
+              </div>
+
+              <ul class="mt-6 space-y-3 text-sm text-muted">
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span class="text-white">Расширенная структура под несколько направлений</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Интерактивный калькулятор сметы или прайс-лист</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Интерактивная карта филиалов и схема проезда</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Подключение базы заявок / CRM и Telegram-бота</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
+                  <span>Срок разработки и запуска — 5–7 дней</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-2.5 pt-2 sm:flex-row lg:flex-col">
+              <a
+                href="https://web.telegram.org/k/#@S4code_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tg-bot-link btn-kinetic magnetic-btn inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-accent-hover"
+              >
+                <span>Написать в Telegram</span>
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href="#contact"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+              >
+                Авито и контакты
+              </a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         7. ЧАСТЫЕ ВОПРОСЫ (FAQ — АККОРДЕОН)
+         ===================================================================== -->
+    <section id="faq" class="border-b border-border py-20 lg:py-28">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+
+        <div class="text-left sm:text-center" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Вопросы</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Частые вопросы
+          </h2>
+        </div>
+
+        <div class="mt-12 divide-y divide-border rounded-2xl border border-border bg-surface" id="faq-list" data-reveal>
+
+          <!-- Вопрос 1 -->
+          <div class="faq-item" data-open="true">
+            <button
+              type="button"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              aria-expanded="true"
+            >
+              <span class="text-base font-bold text-white sm:text-lg">Сколько стоит прототип?</span>
+              <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-content">
+              <div class="faq-inner">
+                <p class="faq-answer px-6 pb-5 text-sm leading-relaxed text-muted sm:text-base">
+                  Бесплатно — вы платите только если результат вам нравится. Мы показываем живую ссылку, которую вы открываете на своём телефоне и проверяете в деле.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Вопрос 2 -->
+          <div class="faq-item" data-open="false">
+            <button
+              type="button"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              aria-expanded="false"
+            >
+              <span class="text-base font-bold text-white sm:text-lg">Как происходит оплата?</span>
+              <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-content">
+              <div class="faq-inner">
+                <p class="faq-answer px-6 pb-5 text-sm leading-relaxed text-muted sm:text-base">
+                  Официально с выдачей чека, только после показа рабочей демки или поэтапно. Никаких предоплат вслепую до того, как вы увидите будущий сайт.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Вопрос 3 -->
+          <div class="faq-item" data-open="false">
+            <button
+              type="button"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              aria-expanded="false"
+            >
+              <span class="text-base font-bold text-white sm:text-lg">Что нужно от меня для старта?</span>
+              <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-content">
+              <div class="faq-inner">
+                <p class="faq-answer px-6 pb-5 text-sm leading-relaxed text-muted sm:text-base">
+                  Только название бизнеса, список услуг и 5 минут на пару вопросов в Telegram. Тексты и структуру экранов мы соберём сами.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Вопрос 4 -->
+          <div class="faq-item" data-open="false">
+            <button
+              type="button"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              aria-expanded="false"
+            >
+              <span class="text-base font-bold text-white sm:text-lg">Будет ли сайт нормально работать на телефоне?</span>
+              <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-content">
+              <div class="faq-inner">
+                <p class="faq-answer px-6 pb-5 text-sm leading-relaxed text-muted sm:text-base">
+                  Да, мы изначально проектируем сайты под мобильные экраны (mobile-first): крупные кнопки, быстрая загрузка, удобные формы и никаких съехавших блоков.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         8. КОНТАКТЫ И ПЛОЩАДКИ ДЛЯ СВЯЗИ (id="contact")
+         Ссылки на Telegram-бота, Авито, канал и почту настраиваются в STUDIO_CONFIG.CONTACTS
+         ===================================================================== -->
+    <section id="contact" class="py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="grid items-start gap-10 lg:grid-cols-12 lg:gap-12">
+
+          <!-- Левая часть: о связи со студией -->
+          <div class="lg:col-span-5" data-reveal>
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Контакты</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Пишите туда, где вам удобнее общаться
+            </h2>
+            <p class="mt-4 text-base leading-relaxed text-muted">
+              Мы не собираем заявки через анонимные формы — напишите напрямую в Telegram или на Авито. Обсудим задачу за 5 минут, покажем похожие работы и соберём бесплатный прототип.
+            </p>
+
+            <div class="mt-6 inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-2 text-xs font-medium text-muted">
+              <span class="status-ping h-2 w-2 rounded-full bg-accent"></span>
+              <span>На связи ежедневно с 09:00 до 21:00 (МСК)</span>
+            </div>
+          </div>
+
+          <!-- Правая часть: сетка площадок и контактов -->
+          <div class="lg:col-span-7 grid gap-4 sm:grid-cols-2" data-reveal-group>
+
+            <!-- Контакт 1: Telegram-бот -->
+            <a
+              href="https://web.telegram.org/k/#@S4code_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="tg-bot-link spotlight-card group flex flex-col justify-between rounded-2xl border border-accent/60 bg-surface p-6 transition-transform duration-300 hover:-translate-y-1"
+              data-reveal="scale"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M21.94 4.66a1.5 1.5 0 0 0-1.6-.23L2.86 11.7a1.25 1.25 0 0 0 .06 2.34l4.46 1.48 1.72 5.3a1 1 0 0 0 1.72.37l2.58-2.74 4.55 3.36a1.35 1.35 0 0 0 2.13-.82l2.14-14.6a1.5 1.5 0 0 0-.28-1.73zM9.42 14.9l8.53-6.17-6.6 7.36-.34 3.04-1.59-4.23z"/>
+                    </svg>
+                  </div>
+                  <span class="rounded-full bg-accent/15 px-2.5 py-1 text-[11px] font-semibold text-accent">Быстрее всего</span>
+                </div>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Telegram-бот</h3>
+                <p class="mt-1.5 text-sm text-muted">
+                  Короткий бриф, расчёт стоимости и живой диалог со студией.
+                </p>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-accent">
+                <span>@S4code_bot</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- Контакт 2: Авито -->
+            <a
+              id="avito-contact-link"
+              href="#AVITO_LINK"
+              data-placeholder-key="avito"
+              class="avito-link placeholder-link spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1"
+              data-reveal="scale"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-white font-extrabold text-sm">
+                    А
+                  </div>
+                  <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Отзывы и профиль</span>
+                </div>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Профиль на Авито</h3>
+                <p class="mt-1.5 text-sm text-muted">
+                  Наши объявления, реальные отзывы клиентов и переписка на площадке.
+                </p>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-white group-hover:text-accent transition-colors">
+                <span>Перейти на Авито</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- Контакт 3: Telegram-канал -->
+            <a
+              href="https://t.me/s4code_channel"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="tg-channel-link spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1"
+              data-reveal="scale"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h6m-7 8l-3 2V5a2 2 0 012-2h14a2 2 0 012 2v11a2 2 0 01-2 2H6z" />
+                    </svg>
+                  </div>
+                  <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Кейсы и новости</span>
+                </div>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Telegram-канал</h3>
+                <p class="mt-1.5 text-sm text-muted">
+                  Показываем свежие проекты, прототипы и закулисье разработки.
+                </p>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-white group-hover:text-accent transition-colors">
+                <span>Открыть канал</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- Контакт 4: Почта / Документы -->
+            <a
+              id="email-contact-link"
+              href="mailto:hello@4code.ru"
+              class="email-link spotlight-card group flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 transition-transform duration-300 hover:-translate-y-1"
+              data-reveal="scale"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg text-accent">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 7l9 6 9-6" />
+                    </svg>
+                  </div>
+                  <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Для ИП и компаний</span>
+                </div>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Электронная почта</h3>
+                <p class="mt-1.5 text-sm text-muted">
+                  Для подробных ТЗ, реквизитов, счетов и коммерческих вопросов.
+                </p>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-white group-hover:text-accent transition-colors">
+                <span id="email-contact-text">hello@4code.ru</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       9. ФУТЕР
+       ===================================================================== -->
+  <footer class="border-t border-border bg-bg py-10">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+
+        <div>
+          <a href="#" class="inline-flex items-center text-xl font-extrabold tracking-tight">
+            <span class="text-accent">4</span><span class="text-white">CODE</span>
+          </a>
+          <p class="mt-2 text-xs text-muted">Сайты и лендинги с прототипом до оплаты</p>
+        </div>
+
+        <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted" aria-label="Навигация в подвале">
+          <a href="#about" class="transition-colors hover:text-white">О студии</a>
+          <a href="#cases" class="transition-colors hover:text-white">Примеры работ</a>
+          <a href="#pricing" class="transition-colors hover:text-white">Тарифы</a>
+          <a href="#contact" class="transition-colors hover:text-white">Контакты</a>
+        </nav>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+          <a
+            href="#AVITO_LINK"
+            data-placeholder-key="avito"
+            class="avito-link placeholder-link text-muted transition-colors hover:text-white"
+          >
+            Авито
+          </a>
+          <span class="h-3 w-px bg-border" aria-hidden="true"></span>
+          <a
+            href="https://t.me/s4code_channel"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tg-channel-link text-muted transition-colors hover:text-white"
+          >
+            Telegram-канал
+          </a>
+          <span class="h-3 w-px bg-border" aria-hidden="true"></span>
+          <a
+            href="https://web.telegram.org/k/#@S4code_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tg-bot-link font-semibold text-accent transition-colors hover:text-accent-hover"
+          >
+            Telegram-бот →
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-8 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <p>© 2026 Студия 4CODE</p>
+        <p>Информация на сайте носит справочный характер и не является публичной офертой (ст. 437 ГК РФ)</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Модальное уведомление для заглушек ссылок (демо / Авито) -->
+  <div
+    id="demo-notice-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="demo-modal-title"
+  >
+    <div class="w-full max-w-md rounded-2xl border border-border bg-surface p-6 toast-pop">
+      <div class="flex items-start justify-between gap-4">
+        <h3 id="demo-modal-title" class="text-lg font-bold text-white">Ссылка пока не подключена</h3>
+        <button id="demo-modal-close" type="button" class="text-muted hover:text-white" aria-label="Закрыть">✕</button>
+      </div>
+      <p class="mt-2.5 text-sm leading-relaxed text-muted">
+        Здесь стоит заглушка (<code id="demo-placeholder-name" class="text-white">#LINK</code>). Замените её в <code class="text-white">STUDIO_CONFIG</code> или напишите нам напрямую в Telegram-бота.
+      </p>
+      <div class="mt-5 flex gap-3">
+        <a
+          id="demo-modal-cta"
+          href="https://web.telegram.org/k/#@S4code_bot"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover"
+        >
+          Открыть Telegram
+        </a>
+        <button
+          id="demo-modal-cancel"
+          type="button"
+          class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-muted"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VANILLA JS: КОНФИГУРАЦИЯ, МОУШЕН-СИСТЕМА И ЛОГИКА ФОРМЫ
+       ===================================================================== -->
+  <script>
+    /**
+     * =====================================================================
+     * КОНФИГУРАЦИЯ СТУДИИ 4CODE (редактируйте значения здесь)
+     * =====================================================================
+     */
+    const STUDIO_CONFIG = {
+      // 1. Контакты и ссылки на площадки (замените на ваши актуальные ссылки)
+      CONTACTS: {
+        telegramBot: 'https://web.telegram.org/k/#@S4code_bot',
+        telegramChannel: 'https://t.me/s4code_channel',
+        avito: '', // Например: 'https://www.avito.ru/user/...'
+        email: 'hello@4code.ru',
+      },
+
+      // 2. Ссылки на живые демки (если пустые, используются href из HTML)
+      DEMO_LINKS: {
+        demo1: 'https://george5556.github.io/tire-demos/',
+        demo2: 'https://george5556.github.io/4code-demos/beauty/',
+        demo3: 'https://george5556.github.io/4code-demos/repair/',
+        demo4: 'https://george5556.github.io/4code-demos/fitness/',
+      },
+
+      // 3. Цены в блоке тарифов
+      PRICES: {
+        lite: 'от 4 000 ₽',
+        landing: 'от 8 000 ₽',
+        business: 'от 13 000 ₽',
+      },
+    };
+
+    const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const HAS_FINE_POINTER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyStudioConfig();
+      initScrollProgress();
+      initRevealChoreography();
+      initSpotlightCards();
+      initMagneticButtons();
+      initHeroMockup();
+      initMobileMenu();
+      initPlaceholderLinks();
+      initFaqAccordion();
+
+      document.querySelectorAll('.hero-mask-line > span').forEach((span) => {
+        span.addEventListener('animationend', () => {
+          span.parentElement.classList.add('is-settled');
+        }, { once: true });
+      });
+      setTimeout(() => {
+        document.querySelectorAll('.hero-mask-line').forEach((el) => el.classList.add('is-settled'));
+      }, 1300);
+    });
+
+    /**
+     * Плавная анимация числовых значений (например, в калькуляторе макета)
+     */
+    function animatePriceValue(element, fromValue, toValue, prefix = '', suffix = ' ₽') {
+      if (!element) return;
+      if (REDUCED_MOTION || fromValue === toValue) {
+        element.textContent = `${prefix}${toValue.toLocaleString('ru-RU')}${suffix}`;
+        return;
+      }
+
+      const duration = 360;
+      const startTime = performance.now();
+
+      function tick(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(fromValue + (toValue - fromValue) * eased);
+        element.textContent = `${prefix}${current.toLocaleString('ru-RU')}${suffix}`;
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    /**
+     * Индикатор прогресса скролла в шапке
+     */
+    function initScrollProgress() {
+      const bar = document.getElementById('scroll-progress');
+      const header = document.getElementById('site-header');
+      if (!bar) return;
+
+      let ticking = false;
+      const update = () => {
+        const scrollTop = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = maxScroll > 0 ? Math.min(Math.max(scrollTop / maxScroll, 0), 1) : 0;
+        bar.style.transform = `scaleX(${progress})`;
+        if (header) {
+          header.classList.toggle('bg-bg/95', scrollTop > 24);
+        }
+        ticking = false;
+      };
+
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+          }
+        },
+        { passive: true }
+      );
+      update();
+    }
+
+    /**
+     * Каскадное появление блоков при скролле + прогресс-линия этапов
+     */
+    function initRevealChoreography() {
+      const groups = document.querySelectorAll('[data-reveal-group]');
+      groups.forEach((group) => {
+        const children = group.querySelectorAll('[data-reveal]');
+        children.forEach((child, index) => {
+          child.style.setProperty('--reveal-delay', `${index * 85}ms`);
+        });
+      });
+
+      const revealEls = document.querySelectorAll('[data-reveal]');
+      const processBeam = document.getElementById('process-beam');
+
+      if (!('IntersectionObserver' in window) || REDUCED_MOTION) {
+        if (processBeam) processBeam.classList.add('is-active');
+        return;
+      }
+
+      document.documentElement.classList.add('reveal-ready');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+      );
+
+      revealEls.forEach((el) => observer.observe(el));
+
+      if (processBeam) {
+        const beamObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                processBeam.classList.add('is-active');
+                beamObserver.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.25 }
+        );
+        beamObserver.observe(processBeam.parentElement);
+      }
+    }
+
+    /**
+     * Курсорный spotlight на 1px границах карточек
+     */
+    function initSpotlightCards() {
+      if (!HAS_FINE_POINTER || REDUCED_MOTION) return;
+      const cards = document.querySelectorAll('.spotlight-card');
+
+      cards.forEach((card) => {
+        card.addEventListener(
+          'pointermove',
+          (event) => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+            card.style.setProperty('--my', `${event.clientY - rect.top}px`);
+          },
+          { passive: true }
+        );
+
+        card.addEventListener('pointerleave', () => {
+          card.style.setProperty('--mx', '-999px');
+          card.style.setProperty('--my', '-999px');
+        });
+      });
+    }
+
+    /**
+     * Магнитный отклик для ключевых кнопок (Desktop)
+     */
+    function initMagneticButtons() {
+      if (!HAS_FINE_POINTER || REDUCED_MOTION) return;
+      const buttons = document.querySelectorAll('.magnetic-btn');
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('pointermove', (event) => {
+          const rect = btn.getBoundingClientRect();
+          const relX = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+          const relY = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+          btn.style.transform = `translate3d(${(relX * 5).toFixed(2)}px, ${(relY * 3.5).toFixed(2)}px, 0)`;
+        });
+
+        btn.addEventListener('pointerleave', () => {
+          btn.style.transform = 'translate3d(0, 0, 0)';
+        });
+      });
+    }
+
+    /**
+     * Применение конфигурации STUDIO_CONFIG (контакты, цены, демки)
+     */
+    function applyStudioConfig() {
+      const litePriceEl = document.getElementById('price-lite');
+      const landingPriceEl = document.getElementById('price-landing');
+      const businessPriceEl = document.getElementById('price-business');
+
+      if (litePriceEl && STUDIO_CONFIG.PRICES.lite) {
+        litePriceEl.textContent = STUDIO_CONFIG.PRICES.lite;
+      }
+      if (landingPriceEl && STUDIO_CONFIG.PRICES.landing) {
+        landingPriceEl.textContent = STUDIO_CONFIG.PRICES.landing;
+      }
+      if (businessPriceEl && STUDIO_CONFIG.PRICES.business) {
+        businessPriceEl.textContent = STUDIO_CONFIG.PRICES.business;
+      }
+
+      if (STUDIO_CONFIG.CONTACTS.telegramBot) {
+        document.querySelectorAll('.tg-bot-link').forEach((link) => {
+          link.setAttribute('href', STUDIO_CONFIG.CONTACTS.telegramBot);
+        });
+      }
+
+      if (STUDIO_CONFIG.CONTACTS.telegramChannel) {
+        document.querySelectorAll('.tg-channel-link').forEach((link) => {
+          link.setAttribute('href', STUDIO_CONFIG.CONTACTS.telegramChannel);
+        });
+      }
+
+      if (STUDIO_CONFIG.CONTACTS.avito) {
+        document.querySelectorAll('.avito-link').forEach((link) => {
+          link.setAttribute('href', STUDIO_CONFIG.CONTACTS.avito);
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        });
+      }
+
+      if (STUDIO_CONFIG.CONTACTS.email) {
+        const emailLink = document.getElementById('email-contact-link');
+        const emailText = document.getElementById('email-contact-text');
+        if (emailLink) emailLink.setAttribute('href', `mailto:${STUDIO_CONFIG.CONTACTS.email}`);
+        if (emailText) emailText.textContent = STUDIO_CONFIG.CONTACTS.email;
+      }
+
+      document.querySelectorAll('.demo-link').forEach((link) => {
+        const key = link.dataset.demoKey;
+        const configuredUrl = STUDIO_CONFIG.DEMO_LINKS[key];
+        if (configuredUrl) {
+          link.setAttribute('href', configuredUrl);
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+    }
+
+    /**
+     * Интерактивный 3D UI-макет в Hero (наклон, Desktop/Phone режим, пересчёт цены)
+     */
+    function initHeroMockup() {
+      const card = document.getElementById('hero-mockup-card');
+      const frameInner = document.getElementById('mockup-frame-inner');
+      const viewButtons = document.querySelectorAll('.mockup-view-btn');
+      const serviceButtons = document.querySelectorAll('.hero-mock-btn');
+      const priceEl = document.getElementById('mock-price');
+      const timeEl = document.getElementById('mock-time');
+      const submitBtn = document.getElementById('mock-submit-btn');
+      const tgToast = document.getElementById('mock-tg-toast');
+
+      // 3D Tilt с плавной интерполяцией (lerp)
+      if (card && HAS_FINE_POINTER && !REDUCED_MOTION) {
+        let targetRx = 0;
+        let targetRy = 0;
+        let currentRx = 0;
+        let currentRy = 0;
+        let rafId = null;
+
+        const animateTilt = () => {
+          currentRx += (targetRx - currentRx) * 0.1;
+          currentRy += (targetRy - currentRy) * 0.1;
+          card.style.transform = `rotateX(${currentRx.toFixed(3)}deg) rotateY(${currentRy.toFixed(3)}deg)`;
+
+          if (Math.abs(targetRx - currentRx) > 0.02 || Math.abs(targetRy - currentRy) > 0.02) {
+            rafId = requestAnimationFrame(animateTilt);
+          } else {
+            rafId = null;
+          }
+        };
+
+        card.addEventListener('pointermove', (event) => {
+          const rect = card.getBoundingClientRect();
+          const normX = (event.clientX - rect.left) / rect.width - 0.5;
+          const normY = (event.clientY - rect.top) / rect.height - 0.5;
+          targetRy = normX * 7;
+          targetRx = -normY * 6;
+          if (!rafId) rafId = requestAnimationFrame(animateTilt);
+        });
+
+        card.addEventListener('pointerleave', () => {
+          targetRx = 0;
+          targetRy = 0;
+          if (!rafId) rafId = requestAnimationFrame(animateTilt);
+        });
+      }
+
+      // Переключение Desktop / Phone внутри макета
+      if (frameInner && viewButtons.length) {
+        viewButtons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const isMobile = btn.dataset.viewport === 'mobile';
+            viewButtons.forEach((b) => {
+              b.classList.remove('bg-accent', 'text-white');
+              b.classList.add('text-muted');
+            });
+            btn.classList.add('bg-accent', 'text-white');
+            btn.classList.remove('text-muted');
+            frameInner.style.maxWidth = isMobile ? '280px' : '100%';
+          });
+        });
+      }
+
+      // Переключение услуг с плавной анимацией числа
+      let currentPrice = 3800;
+      if (serviceButtons.length && priceEl && timeEl) {
+        serviceButtons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            serviceButtons.forEach((item) => {
+              item.classList.remove('border-accent', 'bg-surface');
+              item.classList.add('border-border', 'bg-surface/60');
+              const badge = item.querySelector('span:last-child');
+              if (badge) {
+                badge.classList.remove('text-accent');
+                badge.classList.add('text-muted');
+              }
+            });
+
+            btn.classList.remove('border-border', 'bg-surface/60');
+            btn.classList.add('border-accent', 'bg-surface');
+            const activeBadge = btn.querySelector('span:last-child');
+            if (activeBadge) {
+              activeBadge.classList.remove('text-muted');
+              activeBadge.classList.add('text-accent');
+            }
+
+            const nextPrice = Number(btn.dataset.priceNum || 0);
+            animatePriceValue(priceEl, currentPrice, nextPrice);
+            currentPrice = nextPrice;
+            timeEl.textContent = btn.dataset.time || '';
+            if (tgToast) {
+              tgToast.classList.add('hidden');
+              tgToast.classList.remove('flex', 'toast-pop');
+            }
+          });
+        });
+      }
+
+      // Кнопка «Записаться онлайн» внутри макета
+      let toastTimer = null;
+      if (submitBtn && tgToast) {
+        submitBtn.addEventListener('click', () => {
+          tgToast.classList.remove('hidden', 'toast-pop');
+          void tgToast.offsetWidth;
+          tgToast.classList.add('flex', 'toast-pop');
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => {
+            tgToast.classList.add('hidden');
+            tgToast.classList.remove('flex', 'toast-pop');
+          }, 3400);
+        });
+      }
+    }
+
+    /**
+     * Мобильное бургер-меню
+     */
+    function initMobileMenu() {
+      const toggleBtn = document.getElementById('mobile-menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      const burgerIcon = document.getElementById('burger-icon');
+      const closeIcon = document.getElementById('close-icon');
+      const navLinks = document.querySelectorAll('.mobile-nav-link');
+
+      if (!toggleBtn || !menu) return;
+
+      const setMenuState = (open) => {
+        menu.classList.toggle('hidden', !open);
+        burgerIcon.classList.toggle('hidden', open);
+        closeIcon.classList.toggle('hidden', !open);
+        toggleBtn.setAttribute('aria-expanded', String(open));
+        toggleBtn.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+      };
+
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = toggleBtn.getAttribute('aria-expanded') === 'true';
+        setMenuState(!isOpen);
+      });
+
+      navLinks.forEach((link) => {
+        link.addEventListener('click', () => setMenuState(false));
+      });
+    }
+
+    /**
+     * Обработка заглушек ссылок (#DEMO_LINK_* и #AVITO_LINK)
+     */
+    function initPlaceholderLinks() {
+      const modal = document.getElementById('demo-notice-modal');
+      const placeholderName = document.getElementById('demo-placeholder-name');
+      const closeBtn = document.getElementById('demo-modal-close');
+      const cancelBtn = document.getElementById('demo-modal-cancel');
+      const ctaBtn = document.getElementById('demo-modal-cta');
+
+      if (!modal) return;
+
+      const closeModal = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
+
+      document.querySelectorAll('.demo-link, .placeholder-link').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const href = link.getAttribute('href') || '';
+          if (href.startsWith('#DEMO_LINK') || href === '#AVITO_LINK') {
+            event.preventDefault();
+            if (placeholderName) placeholderName.textContent = href;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+        });
+      });
+
+      [closeBtn, cancelBtn, ctaBtn].forEach((btn) => {
+        if (btn) btn.addEventListener('click', closeModal);
+      });
+
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeModal();
+        }
+      });
+    }
+
+    /**
+     * Интерактивный аккордеон FAQ
+     */
+    function initFaqAccordion() {
+      const items = document.querySelectorAll('.faq-item');
+      if (!items.length) return;
+
+      items.forEach((item) => {
+        const trigger = item.querySelector('.faq-trigger');
+        if (!trigger) return;
+
+        trigger.addEventListener('click', () => {
+          const isOpen = item.getAttribute('data-open') === 'true';
+
+          items.forEach((other) => {
+            other.setAttribute('data-open', 'false');
+            const otherBtn = other.querySelector('.faq-trigger');
+            if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+          });
+
+          const nextState = !isOpen;
+          item.setAttribute('data-open', String(nextState));
+          trigger.setAttribute('aria-expanded', String(nextState));
+        });
+      });
+    }
+  </script>
+</body>
+</html>
