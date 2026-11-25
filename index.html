@@ -1195,7 +1195,7 @@
 
                 <!-- Вертикальный разделитель и ручка -->
                 <div class="ba-divider">
-                  <button type="button" class="ba-knob" aria-label="Сравнить первый экран до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                  <button type="button" class="ba-knob" aria-label="Сравнить первый экран до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
                     </svg>
@@ -1265,7 +1265,7 @@
                 </span>
 
                 <div class="ba-divider">
-                  <button type="button" class="ba-knob" aria-label="Сравнить калькулятор цены до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                  <button type="button" class="ba-knob" aria-label="Сравнить калькулятор цены до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
                     </svg>
@@ -1330,7 +1330,7 @@
                 </span>
 
                 <div class="ba-divider">
-                  <button type="button" class="ba-knob" aria-label="Сравнить мобильную версию до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                  <button type="button" class="ba-knob" aria-label="Сравнить мобильную версию до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
                     </svg>
@@ -2065,7 +2065,7 @@
         let dragging = false;
 
         const applyPct = (pct) => {
-          currentPct = Math.min(95, Math.max(5, pct));
+          currentPct = Math.min(100, Math.max(0, pct));
           slider.style.setProperty('--pos', `${currentPct.toFixed(2)}%`);
           if (knob) knob.setAttribute('aria-valuenow', String(Math.round(currentPct)));
         };
