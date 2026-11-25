@@ -395,6 +395,70 @@
       to { stroke-dashoffset: 0; }
     }
 
+    /* =====================================================================
+       ШТОРКА «ДО / ПОСЛЕ» (BEFORE / AFTER COMPARISON)
+       ===================================================================== */
+    .ba-viewport {
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+      cursor: ew-resize;
+      --pos: 50%;
+    }
+
+    .ba-before-layer {
+      position: absolute;
+      inset: 0;
+      clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+      -webkit-clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+      will-change: clip-path;
+    }
+
+    .ba-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--pos);
+      width: 2px;
+      background: rgba(255, 255, 255, 0.92);
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.65);
+    }
+
+    .ba-knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      background: #FF5500;
+      border: 2px solid #FFFFFF;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(255, 85, 0, 0.45);
+      pointer-events: auto;
+      cursor: grab;
+      transition: transform 0.2s var(--ease-spring), background-color 0.2s ease;
+    }
+
+    .ba-knob:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+      background: #E04B00;
+    }
+
+    .ba-viewport.is-dragging .ba-knob {
+      cursor: grabbing;
+      transform: translate(-50%, -50%) scale(1.12);
+    }
+
     /* Уважение настройки уменьшенного движения */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1070,6 +1134,243 @@
     </section>
 
     <!-- =====================================================================
+         4.5. ШТОРКА «ДО / ПОСЛЕ»: ТИПОВОЙ ШАБЛОН VS САЙТ ОТ 4CODE
+         ===================================================================== -->
+    <section id="comparison" class="border-b border-border py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+        <div class="mx-auto max-w-2xl text-left sm:text-center" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">До / После</p>
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Потяните шторку и сравните результат
+          </h2>
+          <p class="mt-3 text-base text-muted">
+            Слева — то, с чем обычно приходят клиенты на старых конструкторах. Справа — собранный интерфейс от 4CODE.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-6 lg:grid-cols-3" data-reveal-group>
+
+          <!-- Шторка 1: Первый экран -->
+          <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-5" data-reveal="scale">
+            <div>
+              <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
+                <!-- ПОСЛЕ (справа, базовый слой: 4CODE) -->
+                <div class="absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-extrabold tracking-tight"><span class="text-accent">4</span>CODE UI</span>
+                    <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold text-accent">После</span>
+                  </div>
+                  <div class="my-auto space-y-2.5 pt-2">
+                    <span class="inline-block rounded-full border border-border bg-surface px-2.5 py-0.5 text-[9px] text-muted">● Открыто до 21:00</span>
+                    <p class="text-sm font-extrabold leading-snug text-white">Запись за 30 сек <span class="text-accent">без звонков</span></p>
+                    <p class="text-[10px] text-muted">Чёткий оффер, калькулятор цены и переход в Telegram в 1 клик.</p>
+                    <div class="flex gap-2 pt-1">
+                      <span class="rounded-md bg-accent px-2.5 py-1 text-[10px] font-bold text-white">Рассчитать цену</span>
+                      <span class="rounded-md border border-border bg-surface px-2.5 py-1 text-[10px] text-white">Отзывы 4.9★</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ДО (слева, обрезается шторкой: перегруженный шаблон) -->
+                <div class="ba-before-layer flex flex-col justify-between bg-[#25272E] p-4">
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold text-zinc-200">До</span>
+                    <span class="text-[9px] text-zinc-400">Шаблон 2016</span>
+                  </div>
+                  <div class="my-auto space-y-2 border border-dashed border-zinc-600 bg-zinc-800/70 p-3">
+                    <p class="text-xs font-bold text-zinc-300">Добро пожаловать на наш сайт!</p>
+                    <p class="text-[9px] leading-relaxed text-zinc-400">Наша компания с 10-летним опытом предлагает широкий спектр услуг. Звоните в рабочее время...</p>
+                    <div class="flex gap-1.5">
+                      <span class="rounded bg-zinc-600 px-2 py-1 text-[9px] text-zinc-200">Подробнее</span>
+                      <span class="rounded bg-zinc-700 px-2 py-1 text-[9px] text-zinc-400">Прайс.xlsx</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Бейдж результата в углу -->
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                  Конверсия ×2.4
+                </span>
+
+                <!-- Вертикальный разделитель и ручка -->
+                <div class="ba-divider">
+                  <button type="button" class="ba-knob" aria-label="Сравнить первый экран до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Метаданные под шторкой -->
+              <dl class="mt-4 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Первый экран</dt>
+                  <dd class="font-semibold text-white">Оффер + CTA за 3 сек</dd>
+                </div>
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Загрузка</dt>
+                  <dd class="font-semibold text-white">0.6 сек вместо 4.2 сек</dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-muted">Подходит тариф</dt>
+                  <dd class="font-semibold text-accent">Быстрый лендинг</dd>
+                </div>
+              </dl>
+            </div>
+          </article>
+
+          <!-- Шторка 2: Прайс и расчёт стоимости -->
+          <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-5" data-reveal="scale">
+            <div>
+              <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
+                <!-- ПОСЛЕ -->
+                <div class="absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-extrabold tracking-tight"><span class="text-accent">4</span>CODE CALC</span>
+                    <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold text-accent">После</span>
+                  </div>
+                  <div class="space-y-1.5 pt-2">
+                    <div class="flex items-center justify-between rounded-md border border-accent/70 bg-surface px-2.5 py-1.5 text-[10px]">
+                      <span class="text-white font-semibold">Комплексное ТО</span>
+                      <span class="font-bold text-accent">3 800 ₽</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-md border border-border bg-surface px-2.5 py-1.5 text-[10px]">
+                      <span class="text-muted">Диагностика</span>
+                      <span class="font-bold text-white">1 500 ₽</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 text-[10px]">
+                      <span class="text-muted">Итого: <strong class="text-white">3 800 ₽</strong></span>
+                      <span class="rounded bg-accent px-2 py-0.5 font-bold text-white">В Telegram →</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ДО -->
+                <div class="ba-before-layer flex flex-col justify-between bg-[#25272E] p-4">
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold text-zinc-200">До</span>
+                    <span class="text-[9px] text-zinc-400">Таблица цен</span>
+                  </div>
+                  <div class="my-auto space-y-1.5 border border-zinc-600 bg-zinc-800/80 p-2.5 text-[9px] text-zinc-400">
+                    <div class="flex justify-between border-b border-zinc-700 pb-1"><span>Услуга 1</span><span>от ??? ₽</span></div>
+                    <div class="flex justify-between border-b border-zinc-700 pb-1"><span>Услуга 2</span><span>по звонку</span></div>
+                    <p class="pt-1 text-[9px] text-zinc-500">*Точную цену уточняйте у менеджера по телефону...</p>
+                  </div>
+                </div>
+
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                  −60% отказов
+                </span>
+
+                <div class="ba-divider">
+                  <button type="button" class="ba-knob" aria-label="Сравнить калькулятор цены до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <dl class="mt-4 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Расчёт стоимости</dt>
+                  <dd class="font-semibold text-white">Интерактивный за 15 сек</dd>
+                </div>
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Интеграция</dt>
+                  <dd class="font-semibold text-white">Telegram / CRM / Карта</dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-muted">Подходит тариф</dt>
+                  <dd class="font-semibold text-accent">Сайт для бизнеса</dd>
+                </div>
+              </dl>
+            </div>
+          </article>
+
+          <!-- Шторка 3: Мобильная версия -->
+          <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-5" data-reveal="scale">
+            <div>
+              <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
+                <!-- ПОСЛЕ -->
+                <div class="absolute inset-0 flex items-center justify-center bg-[#0E0E10] p-4">
+                  <div class="w-40 rounded-xl border border-accent/60 bg-surface p-3 shadow-xl">
+                    <div class="flex items-center justify-between text-[9px]">
+                      <span class="font-extrabold"><span class="text-accent">4</span>CODE</span>
+                      <span class="text-accent font-bold">Mobile</span>
+                    </div>
+                    <p class="mt-2 text-[11px] font-bold leading-tight text-white">Удобно с телефона</p>
+                    <p class="mt-1 text-[9px] text-muted">Крупный шрифт, чистая сетка</p>
+                    <div class="mt-2.5 rounded bg-accent py-1.5 text-center text-[9px] font-bold text-white">
+                      Написать в Telegram
+                    </div>
+                  </div>
+                  <span class="absolute top-3 right-3 rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold text-accent">После</span>
+                </div>
+
+                <!-- ДО -->
+                <div class="ba-before-layer flex items-center justify-center bg-[#25272E] p-4">
+                  <span class="absolute top-3 left-3 rounded bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold text-zinc-200 opacity-0">До</span>
+                  <div class="w-44 overflow-hidden rounded border border-zinc-600 bg-zinc-800 p-2.5 text-[7px] text-zinc-400">
+                    <div class="flex gap-2 whitespace-nowrap border-b border-zinc-700 pb-1">
+                      <span>Главная</span><span>О нас</span><span>Каталог услуг</span><span>Прайс</span><span>Фото</span>
+                    </div>
+                    <p class="mt-2 whitespace-nowrap text-zinc-300">Сжатая десктопная версия, текст вылез за экран →→→</p>
+                    <div class="mt-2 flex gap-1">
+                      <span class="rounded bg-zinc-700 px-1.5 py-0.5">мелкая кнопка</span>
+                      <span class="rounded bg-zinc-700 px-1.5 py-0.5">скролл вбок</span>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                  80% трафика
+                </span>
+
+                <div class="ba-divider">
+                  <button type="button" class="ba-knob" aria-label="Сравнить мобильную версию до и после" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5M15 7l5 5-5 5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <dl class="mt-4 space-y-1.5 text-xs">
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Адаптация</dt>
+                  <dd class="font-semibold text-white">100% iOS &amp; Android</dd>
+                </div>
+                <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
+                  <dt class="text-muted">Срок запуска</dt>
+                  <dd class="font-semibold text-white">от 1–4 дней</dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-muted">Подходит тариф</dt>
+                  <dd class="font-semibold text-accent">Site Lite / Лендинг</dd>
+                </div>
+              </dl>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="mt-10 text-center" data-reveal>
+          <a
+            href="#contact"
+            class="btn-kinetic magnetic-btn inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-7 py-3.5 text-sm font-semibold text-white hover:bg-accent-hover sm:text-base"
+          >
+            <span>Хочу такой же сайт</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
          5. КАК МЫ РАБОТАЕМ (4 ШАГА 01–04 С КИНЕТИЧЕСКОЙ ЛИНИЕЙ)
          ===================================================================== -->
     <section id="process" class="border-b border-border py-20 lg:py-28">
@@ -1710,6 +2011,7 @@
       initSpotlightCards();
       initMagneticButtons();
       initHeroMockup();
+      initBeforeAfterSliders();
       initMobileMenu();
       initPlaceholderLinks();
       initFaqAccordion();
@@ -1748,6 +2050,71 @@
       }
 
       requestAnimationFrame(tick);
+    }
+
+    /**
+     * Интерактивные шторки «До / После» (Pointer Events + клавиатура)
+     */
+    function initBeforeAfterSliders() {
+      const sliders = document.querySelectorAll('[data-ba-slider]');
+      if (!sliders.length) return;
+
+      sliders.forEach((slider) => {
+        const knob = slider.querySelector('.ba-knob');
+        let currentPct = 50;
+        let dragging = false;
+
+        const applyPct = (pct) => {
+          currentPct = Math.min(95, Math.max(5, pct));
+          slider.style.setProperty('--pos', `${currentPct.toFixed(2)}%`);
+          if (knob) knob.setAttribute('aria-valuenow', String(Math.round(currentPct)));
+        };
+
+        const updateFromPointer = (clientX) => {
+          const rect = slider.getBoundingClientRect();
+          if (!rect.width) return;
+          const pct = ((clientX - rect.left) / rect.width) * 100;
+          applyPct(pct);
+        };
+
+        slider.addEventListener('pointerdown', (event) => {
+          dragging = true;
+          slider.classList.add('is-dragging');
+          if (slider.setPointerCapture) {
+            try { slider.setPointerCapture(event.pointerId); } catch (_) {}
+          }
+          updateFromPointer(event.clientX);
+        });
+
+        slider.addEventListener('pointermove', (event) => {
+          if (!dragging) return;
+          updateFromPointer(event.clientX);
+        });
+
+        const stopDrag = (event) => {
+          if (!dragging) return;
+          dragging = false;
+          slider.classList.remove('is-dragging');
+          if (slider.releasePointerCapture && event.pointerId !== undefined) {
+            try { slider.releasePointerCapture(event.pointerId); } catch (_) {}
+          }
+        };
+
+        slider.addEventListener('pointerup', stopDrag);
+        slider.addEventListener('pointercancel', stopDrag);
+
+        if (knob) {
+          knob.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+              event.preventDefault();
+              applyPct(currentPct - 5);
+            } else if (event.key === 'ArrowRight') {
+              event.preventDefault();
+              applyPct(currentPct + 5);
+            }
+          });
+        }
+      });
     }
 
     /**
