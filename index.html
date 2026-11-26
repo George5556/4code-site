@@ -25,6 +25,21 @@
     rel="stylesheet"
   />
 
+  <!-- Pre-render Theme Init (Light / Dark / System) -->
+  <script>
+    (() => {
+      const mql = window.matchMedia('(prefers-color-scheme: dark)');
+      let saved = 'system';
+      try {
+        saved = localStorage.getItem('4code-theme') || 'system';
+      } catch (e) {}
+      if (saved !== 'light' && saved !== 'dark' && saved !== 'system') saved = 'system';
+      const resolved = saved === 'system' ? (mql.matches ? 'dark' : 'light') : saved;
+      document.documentElement.dataset.themeMode = saved;
+      document.documentElement.dataset.theme = resolved;
+    })();
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -32,12 +47,13 @@
       theme: {
         extend: {
           colors: {
-            bg: '#0E0E10',
-            surface: '#16161A',
-            border: '#26262C',
+            bg: 'rgb(var(--c-bg) / <alpha-value>)',
+            surface: 'rgb(var(--c-surface) / <alpha-value>)',
+            border: 'rgb(var(--c-border) / <alpha-value>)',
+            ink: 'rgb(var(--c-ink) / <alpha-value>)',
             accent: '#FF5500',
             'accent-hover': '#E04B00',
-            muted: '#A1A1AA',
+            muted: 'rgb(var(--c-muted) / <alpha-value>)',
           },
           fontFamily: {
             sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
@@ -49,17 +65,32 @@
 
   <style>
     :root {
-      color-scheme: dark;
+      color-scheme: light;
+      --c-bg: 247 247 248;
+      --c-surface: 255 255 255;
+      --c-border: 226 226 232;
+      --c-ink: 17 17 20;
+      --c-muted: 88 88 98;
       --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
       --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --c-bg: 14 14 16;
+      --c-surface: 22 22 26;
+      --c-border: 38 38 44;
+      --c-ink: 255 255 255;
+      --c-muted: 161 161 170;
+    }
+
     body {
-      background-color: #0E0E10;
-      color: #FFFFFF;
+      background-color: rgb(var(--c-bg));
+      color: rgb(var(--c-ink));
       font-family: 'Manrope', system-ui, -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     section[id] {
@@ -481,15 +512,54 @@
       }
     }
 
+    /* Светлая тема: мягкие сетка, блики и тени */
+    html[data-theme="light"] .hero-grid {
+      background-image:
+        linear-gradient(to right, rgba(17, 17, 20, 0.065) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(17, 17, 20, 0.065) 1px, transparent 1px);
+    }
+
+    html[data-theme="light"] .grid-beam-v {
+      background: linear-gradient(180deg, transparent, rgba(17, 17, 20, 0.18), transparent);
+    }
+
+    html[data-theme="light"] .spotlight-card::after {
+      background: radial-gradient(
+        260px circle at var(--mx) var(--my),
+        rgba(255, 85, 0, 0.55),
+        rgba(17, 17, 20, 0.14) 45%,
+        transparent 75%
+      );
+    }
+
+    html[data-theme="light"] #hero-mockup-card {
+      box-shadow: 0 24px 60px -15px rgba(17, 17, 20, 0.14), 0 4px 16px -4px rgba(17, 17, 20, 0.06);
+    }
+
+    /* Слой «После» внутри сравнения остаётся тёмным в обеих темах */
+    .ba-after-layer {
+      --c-bg: 14 14 16;
+      --c-surface: 22 22 26;
+      --c-border: 38 38 44;
+      --c-ink: 255 255 255;
+      --c-muted: 161 161 170;
+      color: #FFFFFF;
+    }
+
+    .theme-btn[aria-pressed="true"] {
+      background-color: #FF5500;
+      color: #FFFFFF;
+    }
+
     /* Стилизация скроллбара */
     ::-webkit-scrollbar {
       width: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #0E0E10;
+      background: rgb(var(--c-bg));
     }
     ::-webkit-scrollbar-thumb {
-      background: #26262C;
+      background: rgb(var(--c-border));
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -497,7 +567,7 @@
     }
   </style>
 </head>
-<body class="bg-bg text-white selection:bg-accent selection:text-white overflow-x-hidden">
+<body class="bg-bg text-ink selection:bg-accent selection:text-white overflow-x-hidden">
 
   <!-- =====================================================================
        1. ЗАКРЕПЛЁННАЯ ШАПКА (HEADER) + SCROLL PROGRESS LINE
@@ -511,20 +581,56 @@
         class="group inline-flex items-center text-xl font-extrabold tracking-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
         aria-label="4CODE — На главную"
       >
-        <span class="text-accent transition-transform duration-300 group-hover:-translate-y-0.5">4</span><span class="text-white">CODE</span>
+        <span class="text-accent transition-transform duration-300 group-hover:-translate-y-0.5">4</span><span class="text-ink">CODE</span>
       </a>
 
       <!-- Навигация (Desktop) -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-muted" aria-label="Основная навигация">
-        <a href="#about" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">О студии</a>
-        <a href="#cases" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Примеры работ</a>
-        <a href="#process" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Как работаем</a>
-        <a href="#pricing" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Тарифы</a>
-        <a href="#faq" class="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Вопросы</a>
+      <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium text-muted whitespace-nowrap" aria-label="Основная навигация">
+        <a href="#about" class="relative py-1 transition-colors hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">О студии</a>
+        <a href="#cases" class="relative py-1 transition-colors hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Примеры работ</a>
+        <a href="#process" class="relative py-1 transition-colors hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Как работаем</a>
+        <a href="#pricing" class="relative py-1 transition-colors hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Тарифы</a>
+        <a href="#faq" class="relative py-1 transition-colors hover:text-ink after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100">Вопросы</a>
       </nav>
 
-      <!-- Правая часть: CTA + бургер-меню -->
-      <div class="flex items-center gap-3">
+      <!-- Правая часть: Тема + CTA + бургер-меню -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <div
+          class="inline-flex items-center rounded-lg border border-border bg-surface p-0.5 text-[11px] font-semibold text-muted"
+          role="group"
+          aria-label="Переключатель темы оформления"
+        >
+          <button
+            type="button"
+            data-theme-set="system"
+            aria-pressed="true"
+            title="Как в системе"
+            class="theme-btn rounded-md px-2 py-1 transition-colors hover:text-ink"
+          >
+            Авто
+          </button>
+          <button
+            type="button"
+            data-theme-set="light"
+            aria-pressed="false"
+            title="Светлая тема"
+            aria-label="Светлая тема"
+            class="theme-btn rounded-md px-2 py-1 transition-colors hover:text-ink"
+          >
+            ☀
+          </button>
+          <button
+            type="button"
+            data-theme-set="dark"
+            aria-pressed="false"
+            title="Тёмная тема"
+            aria-label="Тёмная тема"
+            class="theme-btn rounded-md px-2 py-1 transition-colors hover:text-ink"
+          >
+            ☾
+          </button>
+        </div>
+
         <a
           href="#contact"
           class="btn-kinetic magnetic-btn hidden sm:inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
@@ -536,7 +642,7 @@
         <button
           id="mobile-menu-toggle"
           type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-white transition-colors hover:border-muted md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-ink transition-colors hover:border-muted lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           aria-label="Открыть меню"
           aria-expanded="false"
           aria-controls="mobile-menu"
@@ -557,21 +663,21 @@
     </div>
 
     <!-- Выпадающее мобильное меню -->
-    <div id="mobile-menu" class="hidden border-t border-border bg-bg md:hidden">
+    <div id="mobile-menu" class="hidden border-t border-border bg-bg lg:hidden">
       <nav class="mx-auto flex max-w-6xl flex-col px-4 py-4 space-y-1" aria-label="Мобильная навигация">
-        <a href="#about" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+        <a href="#about" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-ink">
           О студии
         </a>
-        <a href="#cases" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+        <a href="#cases" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-ink">
           Примеры работ
         </a>
-        <a href="#process" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+        <a href="#process" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-ink">
           Как работаем
         </a>
-        <a href="#pricing" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+        <a href="#pricing" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-ink">
           Тарифы
         </a>
-        <a href="#faq" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-white">
+        <a href="#faq" class="mobile-nav-link rounded-lg px-3 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-ink">
           Вопросы
         </a>
         <div class="pt-3">
@@ -612,7 +718,7 @@
             </div>
 
             <!-- Заголовок с masked line reveal -->
-            <h1 class="mt-6 text-3xl font-extrabold leading-[1.28] tracking-tight text-white sm:text-5xl sm:leading-[1.24] lg:text-[50px] lg:leading-[1.24]">
+            <h1 class="mt-6 text-3xl font-extrabold leading-[1.28] tracking-tight text-ink sm:text-5xl sm:leading-[1.24] lg:text-[50px] lg:leading-[1.24]">
               <span class="hero-mask-line"><span style="--delay: 110ms;">Делаем сайты, которые</span></span>
               <span class="hero-mask-line"><span style="--delay: 190ms;">приносят заявки. Показываем</span></span>
               <span class="hero-mask-line"><span style="--delay: 270ms;"><span class="text-accent">живой прототип</span> до оплаты.</span></span>
@@ -634,7 +740,7 @@
               </a>
               <a
                 href="#cases"
-                class="btn-kinetic inline-flex items-center justify-center rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-muted sm:text-base"
+                class="btn-kinetic inline-flex items-center justify-center rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-muted sm:text-base"
               >
                 Смотреть живые примеры
               </a>
@@ -643,17 +749,17 @@
             <!-- Мини-факты с счётчиками -->
             <div class="hero-enter mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-6 text-xs text-muted sm:text-sm" style="--delay: 500ms;">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-white tabular-nums">0 ₽</span>
+                <span class="font-bold text-ink tabular-nums">0 ₽</span>
                 <span>за первый прототип</span>
               </div>
               <span class="hidden h-3 w-px bg-border sm:inline-block" aria-hidden="true"></span>
               <div class="flex items-center gap-2">
-                <span class="font-bold text-white tabular-nums">3–7 дней</span>
+                <span class="font-bold text-ink tabular-nums">3–7 дней</span>
                 <span>до запуска</span>
               </div>
               <span class="hidden h-3 w-px bg-border sm:inline-block" aria-hidden="true"></span>
               <div class="flex items-center gap-2">
-                <span class="font-bold text-white">Telegram</span>
+                <span class="font-bold text-ink">Telegram</span>
                 <span>мгновенные заявки</span>
               </div>
             </div>
@@ -682,7 +788,7 @@
                   <button
                     type="button"
                     data-viewport="mobile"
-                    class="mockup-view-btn rounded px-2 py-0.5 text-muted hover:text-white transition-colors"
+                    class="mockup-view-btn rounded px-2 py-0.5 text-muted hover:text-ink transition-colors"
                   >
                     Phone
                   </button>
@@ -701,9 +807,9 @@
                   <div class="flex items-center justify-between gap-2 border-b border-border pb-3">
                     <div>
                       <p class="text-[10px] uppercase tracking-wider text-muted">box24-service.ru</p>
-                      <p class="text-sm font-bold text-white">Автосервис «БОКС 24»</p>
+                      <p class="text-sm font-bold text-ink">Автосервис «БОКС 24»</p>
                     </div>
-                    <span class="shrink-0 rounded border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-white tabular-nums">
+                    <span class="shrink-0 rounded border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-ink tabular-nums">
                       09:00–21:00
                     </span>
                   </div>
@@ -719,7 +825,7 @@
                         data-time="45 мин"
                         class="hero-mock-btn flex items-center justify-between rounded-lg border border-accent bg-surface px-3.5 py-2.5 text-left transition-all duration-200"
                       >
-                        <span class="text-xs font-semibold text-white">Комплексное ТО и масло</span>
+                        <span class="text-xs font-semibold text-ink">Комплексное ТО и масло</span>
                         <span class="text-xs font-bold text-accent tabular-nums">3 800 ₽</span>
                       </button>
 
@@ -730,7 +836,7 @@
                         data-time="30 мин"
                         class="hero-mock-btn flex items-center justify-between rounded-lg border border-border bg-surface/60 px-3.5 py-2.5 text-left transition-all duration-200 hover:border-muted"
                       >
-                        <span class="text-xs font-semibold text-white">Шиномонтаж R17 (4 колеса)</span>
+                        <span class="text-xs font-semibold text-ink">Шиномонтаж R17 (4 колеса)</span>
                         <span class="text-xs font-bold text-muted tabular-nums">2 600 ₽</span>
                       </button>
 
@@ -741,7 +847,7 @@
                         data-time="25 мин"
                         class="hero-mock-btn flex items-center justify-between rounded-lg border border-border bg-surface/60 px-3.5 py-2.5 text-left transition-all duration-200 hover:border-muted"
                       >
-                        <span class="text-xs font-semibold text-white">Компьютерная диагностика</span>
+                        <span class="text-xs font-semibold text-ink">Компьютерная диагностика</span>
                         <span class="text-xs font-bold text-muted tabular-nums">1 500 ₽</span>
                       </button>
                     </div>
@@ -750,8 +856,8 @@
                   <!-- Итог + кнопка в макете -->
                   <div class="mt-4 rounded-xl border border-border bg-surface p-3.5">
                     <div class="flex items-center justify-between text-xs">
-                      <span class="text-muted">Время: <strong id="mock-time" class="text-white">45 мин</strong></span>
-                      <span id="mock-price" class="text-base font-extrabold text-white tabular-nums">3 800 ₽</span>
+                      <span class="text-muted">Время: <strong id="mock-time" class="text-ink">45 мин</strong></span>
+                      <span id="mock-price" class="text-base font-extrabold text-ink tabular-nums">3 800 ₽</span>
                     </div>
 
                     <button
@@ -768,7 +874,7 @@
                       id="mock-tg-toast"
                       class="mt-2.5 hidden items-center justify-between rounded-md border border-accent/40 bg-bg px-3 py-2 text-[11px]"
                     >
-                      <span class="font-medium text-white">Заявка отправлена в Telegram</span>
+                      <span class="font-medium text-ink">Заявка отправлена в Telegram</span>
                       <span class="font-semibold text-accent">✓ Доставлено</span>
                     </div>
                   </div>
@@ -787,27 +893,27 @@
     <div class="ticker-wrap overflow-hidden border-b border-border bg-surface/50 py-3.5 select-none" aria-hidden="true">
       <div class="ticker-track text-xs font-semibold uppercase tracking-[0.16em] text-muted">
         <div class="flex items-center gap-8 pr-8">
-          <span class="text-white">Прототип до оплаты</span>
+          <span class="text-ink">Прототип до оплаты</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
           <span>Запуск за 3–7 дней</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
-          <span class="text-white">100% Mobile-First</span>
+          <span class="text-ink">100% Mobile-First</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
           <span>Заявки сразу в Telegram</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
-          <span class="text-white">Официально с чеком</span>
+          <span class="text-ink">Официально с чеком</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
         </div>
         <div class="flex items-center gap-8 pr-8">
-          <span class="text-white">Прототип до оплаты</span>
+          <span class="text-ink">Прототип до оплаты</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
           <span>Запуск за 3–7 дней</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
-          <span class="text-white">100% Mobile-First</span>
+          <span class="text-ink">100% Mobile-First</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
           <span>Заявки сразу в Telegram</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
-          <span class="text-white">Официально с чеком</span>
+          <span class="text-ink">Официально с чеком</span>
           <span class="h-1 w-1 rounded-full bg-accent"></span>
         </div>
       </div>
@@ -821,7 +927,7 @@
         <div class="mb-12 grid gap-6 lg:grid-cols-12 lg:items-end" data-reveal>
           <div class="lg:col-span-7">
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">О студии 4CODE</p>
-            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
               Проектируем быстрые сайты для реального бизнеса
             </h2>
           </div>
@@ -840,7 +946,7 @@
                 <circle cx="12" cy="12" r="2.75" />
               </svg>
             </div>
-            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Прототип до оплаты</h2>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-ink">Прототип до оплаты</h2>
             <p class="mt-2 text-sm leading-relaxed text-muted">
               Сначала вы сами открываете готовый макет с телефона и только потом принимаете решение.
             </p>
@@ -853,7 +959,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
               </svg>
             </div>
-            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Запуск за 3–7 дней</h2>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-ink">Запуск за 3–7 дней</h2>
             <p class="mt-2 text-sm leading-relaxed text-muted">
               Без затянутых согласований на месяцы — фокус на структуре, скорости и заявках.
             </p>
@@ -867,7 +973,7 @@
                 <path stroke-linecap="round" d="M11 18.5h2" />
               </svg>
             </div>
-            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">100% под телефоны</h2>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-ink">100% под телефоны</h2>
             <p class="mt-2 text-sm leading-relaxed text-muted">
               80% клиентов заходят со смартфонов, поэтому всё тестируем на мобильных экранах.
             </p>
@@ -880,7 +986,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 4L3 11.2l6.6 2.2L17.5 7l-6.1 7.6 5.3 4.1L21 4z" />
               </svg>
             </div>
-            <h2 class="mt-5 text-lg font-bold tracking-tight text-white">Заявки сразу в Telegram</h2>
+            <h2 class="mt-5 text-lg font-bold tracking-tight text-ink">Заявки сразу в Telegram</h2>
             <p class="mt-2 text-sm leading-relaxed text-muted">
               Форма обратной связи и уведомления подключаются напрямую в ваш мессенджер.
             </p>
@@ -901,7 +1007,7 @@
         <!-- Заголовок секции -->
         <div class="max-w-2xl" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Примеры работ</p>
-          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Живые демки, которые можно покликать прямо сейчас
           </h2>
           <p class="mt-3 text-base text-muted">
@@ -928,7 +1034,7 @@
                     <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
                     Кейс #01
                   </span>
-                  <span class="rounded border border-border px-2 py-0.5 text-white">Шиномонтаж</span>
+                  <span class="rounded border border-border px-2 py-0.5 text-ink">Шиномонтаж</span>
                 </div>
                 <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
                   <img
@@ -940,7 +1046,7 @@
                 </div>
               </a>
 
-              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Хороший шиномонтаж</h3>
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-ink">Хороший шиномонтаж</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Тёмный лендинг для шиномонтажа: статус работы, быстрая запись, блок отзывов с Яндекс Карт и полная адаптация под телефоны.
               </p>
@@ -976,11 +1082,11 @@
                     <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
                     Кейс #02
                   </span>
-                  <span class="rounded border border-border px-2 py-0.5 text-white">Бьюти-салон</span>
+                  <span class="rounded border border-border px-2 py-0.5 text-ink">Бьюти-салон</span>
                 </div>
                 <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
                   <img
-                    src="case-beauty-preview.png?v=3"
+                    src="case-beauty-preview.png?v=4"
                     alt="Превью сайта Салон красоты LUMI"
                     class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                     loading="lazy"
@@ -988,7 +1094,7 @@
                 </div>
               </a>
 
-              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Салон красоты «LUMI»</h3>
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-ink">Салон красоты «LUMI»</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Онлайн-калькулятор визита, выбор мастера, блок отзывов с Яндекс Карт и интерактивная карта филиалов.
               </p>
@@ -1024,11 +1130,11 @@
                     <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
                     Кейс #03
                   </span>
-                  <span class="rounded border border-border px-2 py-0.5 text-white">Ремонт техники</span>
+                  <span class="rounded border border-border px-2 py-0.5 text-ink">Ремонт техники</span>
                 </div>
                 <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
                   <img
-                    src="case-repair-preview.png?v=3"
+                    src="case-repair-preview.png?v=4"
                     alt="Превью сайта Ремонт техники FIXLAB"
                     class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                     loading="lazy"
@@ -1036,7 +1142,7 @@
                 </div>
               </a>
 
-              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Сервисный центр «FIXLAB»</h3>
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-ink">Сервисный центр «FIXLAB»</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Калькулятор сметы с выбором качества деталей, этапы работы, отзывы с Яндекс Карт и карта филиалов.
               </p>
@@ -1072,11 +1178,11 @@
                     <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
                     Кейс #04
                   </span>
-                  <span class="rounded border border-border px-2 py-0.5 text-white">Фитнес-клуб</span>
+                  <span class="rounded border border-border px-2 py-0.5 text-ink">Фитнес-клуб</span>
                 </div>
                 <div class="aspect-[16/10] w-full overflow-hidden bg-bg">
                   <img
-                    src="case-fitness-preview.png?v=3"
+                    src="case-fitness-preview.png?v=4"
                     alt="Превью сайта Фитнес-клуб IRONBASE"
                     class="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                     loading="lazy"
@@ -1084,7 +1190,7 @@
                 </div>
               </a>
 
-              <h3 class="mt-6 text-xl font-bold tracking-tight text-white">Фитнес-клуб «IRONBASE»</h3>
+              <h3 class="mt-6 text-xl font-bold tracking-tight text-ink">Фитнес-клуб «IRONBASE»</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Конструктор абонемента, расписание групп, отзывы резидентов с Яндекс Карт и интерактивная карта клубов.
               </p>
@@ -1113,7 +1219,7 @@
               <span class="status-ping h-1.5 w-1.5 rounded-full bg-accent"></span>
               <span>Свободный слот на этой неделе</span>
             </div>
-            <h3 class="mt-4 text-xl font-bold tracking-tight text-white sm:text-2xl">
+            <h3 class="mt-4 text-xl font-bold tracking-tight text-ink sm:text-2xl">
               Ваш бизнес может быть следующим
             </h3>
             <p class="mt-2 text-sm leading-relaxed text-muted">
@@ -1123,7 +1229,7 @@
           <div class="shrink-0">
             <a
               href="#contact"
-              class="btn-kinetic inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:border-accent hover:bg-accent hover:text-white md:w-auto"
+              class="btn-kinetic inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-accent hover:bg-accent hover:text-white md:w-auto"
             >
               <span>Связаться с нами</span>
               <span aria-hidden="true">→</span>
@@ -1141,7 +1247,7 @@
 
         <div class="mx-auto max-w-2xl text-left sm:text-center" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">До / После</p>
-          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Потяните шторку и сравните результат
           </h2>
           <p class="mt-3 text-base text-muted">
@@ -1156,18 +1262,18 @@
             <div>
               <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
                 <!-- ПОСЛЕ (справа, базовый слой: 4CODE) -->
-                <div class="absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
+                <div class="ba-after-layer absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
                   <div class="flex items-center justify-between">
                     <span class="text-[10px] font-extrabold tracking-tight"><span class="text-accent">4</span>CODE UI</span>
                     <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold text-accent">После</span>
                   </div>
                   <div class="my-auto space-y-2.5 pt-2">
                     <span class="inline-block rounded-full border border-border bg-surface px-2.5 py-0.5 text-[9px] text-muted">● Открыто до 21:00</span>
-                    <p class="text-sm font-extrabold leading-snug text-white">Запись за 30 сек <span class="text-accent">без звонков</span></p>
+                    <p class="text-sm font-extrabold leading-snug text-ink">Запись за 30 сек <span class="text-accent">без звонков</span></p>
                     <p class="text-[10px] text-muted">Чёткий оффер, калькулятор цены и переход в Telegram в 1 клик.</p>
                     <div class="flex gap-2 pt-1">
                       <span class="rounded-md bg-accent px-2.5 py-1 text-[10px] font-bold text-white">Рассчитать цену</span>
-                      <span class="rounded-md border border-border bg-surface px-2.5 py-1 text-[10px] text-white">Отзывы 4.9★</span>
+                      <span class="rounded-md border border-border bg-surface px-2.5 py-1 text-[10px] text-ink">Отзывы 4.9★</span>
                     </div>
                   </div>
                 </div>
@@ -1189,7 +1295,7 @@
                 </div>
 
                 <!-- Бейдж результата в углу -->
-                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-[#0E0E10] shadow">
                   Конверсия ×2.4
                 </span>
 
@@ -1207,11 +1313,11 @@
               <dl class="mt-4 space-y-1.5 text-xs">
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Первый экран</dt>
-                  <dd class="font-semibold text-white">Оффер + CTA за 3 сек</dd>
+                  <dd class="font-semibold text-ink">Оффер + CTA за 3 сек</dd>
                 </div>
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Загрузка</dt>
-                  <dd class="font-semibold text-white">0.6 сек вместо 4.2 сек</dd>
+                  <dd class="font-semibold text-ink">0.6 сек вместо 4.2 сек</dd>
                 </div>
                 <div class="flex items-center justify-between">
                   <dt class="text-muted">Подходит тариф</dt>
@@ -1226,22 +1332,22 @@
             <div>
               <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
                 <!-- ПОСЛЕ -->
-                <div class="absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
+                <div class="ba-after-layer absolute inset-0 flex flex-col justify-between bg-[#0E0E10] p-4">
                   <div class="flex items-center justify-between">
                     <span class="text-[10px] font-extrabold tracking-tight"><span class="text-accent">4</span>CODE CALC</span>
                     <span class="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold text-accent">После</span>
                   </div>
                   <div class="space-y-1.5 pt-2">
                     <div class="flex items-center justify-between rounded-md border border-accent/70 bg-surface px-2.5 py-1.5 text-[10px]">
-                      <span class="text-white font-semibold">Комплексное ТО</span>
+                      <span class="text-ink font-semibold">Комплексное ТО</span>
                       <span class="font-bold text-accent">3 800 ₽</span>
                     </div>
                     <div class="flex items-center justify-between rounded-md border border-border bg-surface px-2.5 py-1.5 text-[10px]">
                       <span class="text-muted">Диагностика</span>
-                      <span class="font-bold text-white">1 500 ₽</span>
+                      <span class="font-bold text-ink">1 500 ₽</span>
                     </div>
                     <div class="flex items-center justify-between pt-1 text-[10px]">
-                      <span class="text-muted">Итого: <strong class="text-white">3 800 ₽</strong></span>
+                      <span class="text-muted">Итого: <strong class="text-ink">3 800 ₽</strong></span>
                       <span class="rounded bg-accent px-2 py-0.5 font-bold text-white">В Telegram →</span>
                     </div>
                   </div>
@@ -1260,7 +1366,7 @@
                   </div>
                 </div>
 
-                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-[#0E0E10] shadow">
                   −60% отказов
                 </span>
 
@@ -1276,11 +1382,11 @@
               <dl class="mt-4 space-y-1.5 text-xs">
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Расчёт стоимости</dt>
-                  <dd class="font-semibold text-white">Интерактивный за 15 сек</dd>
+                  <dd class="font-semibold text-ink">Интерактивный за 15 сек</dd>
                 </div>
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Интеграция</dt>
-                  <dd class="font-semibold text-white">Telegram / CRM / Карта</dd>
+                  <dd class="font-semibold text-ink">Telegram / CRM / Карта</dd>
                 </div>
                 <div class="flex items-center justify-between">
                   <dt class="text-muted">Подходит тариф</dt>
@@ -1295,13 +1401,13 @@
             <div>
               <div class="ba-viewport aspect-[4/3] w-full rounded-xl border border-border bg-bg" data-ba-slider style="--pos: 50%;">
                 <!-- ПОСЛЕ -->
-                <div class="absolute inset-0 flex items-center justify-center bg-[#0E0E10] p-4">
+                <div class="ba-after-layer absolute inset-0 flex items-center justify-center bg-[#0E0E10] p-4">
                   <div class="w-40 rounded-xl border border-accent/60 bg-surface p-3 shadow-xl">
                     <div class="flex items-center justify-between text-[9px]">
                       <span class="font-extrabold"><span class="text-accent">4</span>CODE</span>
                       <span class="text-accent font-bold">Mobile</span>
                     </div>
-                    <p class="mt-2 text-[11px] font-bold leading-tight text-white">Удобно с телефона</p>
+                    <p class="mt-2 text-[11px] font-bold leading-tight text-ink">Удобно с телефона</p>
                     <p class="mt-1 text-[9px] text-muted">Крупный шрифт, чистая сетка</p>
                     <div class="mt-2.5 rounded bg-accent py-1.5 text-center text-[9px] font-bold text-white">
                       Написать в Telegram
@@ -1325,7 +1431,7 @@
                   </div>
                 </div>
 
-                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-bg shadow">
+                <span class="pointer-events-none absolute top-2.5 left-2.5 z-20 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold text-[#0E0E10] shadow">
                   80% трафика
                 </span>
 
@@ -1341,11 +1447,11 @@
               <dl class="mt-4 space-y-1.5 text-xs">
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Адаптация</dt>
-                  <dd class="font-semibold text-white">100% iOS &amp; Android</dd>
+                  <dd class="font-semibold text-ink">100% iOS &amp; Android</dd>
                 </div>
                 <div class="flex items-center justify-between border-b border-border/60 pb-1.5">
                   <dt class="text-muted">Срок запуска</dt>
-                  <dd class="font-semibold text-white">от 1–4 дней</dd>
+                  <dd class="font-semibold text-ink">от 1–4 дней</dd>
                 </div>
                 <div class="flex items-center justify-between">
                   <dt class="text-muted">Подходит тариф</dt>
@@ -1378,7 +1484,7 @@
 
         <div class="max-w-2xl" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Процесс</p>
-          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Как мы работаем
           </h2>
           <p class="mt-3 text-base text-muted">
@@ -1397,7 +1503,7 @@
             <!-- Шаг 01 -->
             <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
               <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">01</span>
-              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Короткий бриф</h3>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-ink">Короткий бриф</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 5 минут в Telegram — узнаём нишу, услуги и пожелания.
               </p>
@@ -1406,7 +1512,7 @@
             <!-- Шаг 02 -->
             <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
               <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">02</span>
-              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Живой прототип</h3>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-ink">Живой прототип</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Собираем рабочую демо-версию и кидаем ссылку на телефон.
               </p>
@@ -1415,7 +1521,7 @@
             <!-- Шаг 03 -->
             <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
               <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">03</span>
-              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Правки и оплата</h3>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-ink">Правки и оплата</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Докручиваем детали под вас, работаем официально с чеком.
               </p>
@@ -1424,7 +1530,7 @@
             <!-- Шаг 04 -->
             <div class="spotlight-card group bg-surface p-6 sm:p-7" data-reveal>
               <span class="inline-block text-4xl font-extrabold tracking-tight text-accent tabular-nums transition-transform duration-300 group-hover:translate-x-1">04</span>
-              <h3 class="mt-6 text-lg font-bold tracking-tight text-white">Запуск и передача</h3>
+              <h3 class="mt-6 text-lg font-bold tracking-tight text-ink">Запуск и передача</h3>
               <p class="mt-2.5 text-sm leading-relaxed text-muted">
                 Подключаем домен, настраиваем заявки и передаём готовый сайт.
               </p>
@@ -1444,7 +1550,7 @@
 
         <div class="max-w-2xl" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Тарифы</p>
-          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Прозрачная стоимость без скрытых доплат
           </h2>
           <p class="mt-3 text-base text-muted">
@@ -1458,7 +1564,7 @@
           <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
             <div>
               <div class="flex items-center justify-between gap-2">
-                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Site Lite</h3>
+                <h3 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Site Lite</h3>
                 <span class="rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
                   1–2 дня
                 </span>
@@ -1466,7 +1572,7 @@
 
               <!-- ЦЕНА ТАРИФА SITE LITE -->
               <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
-                <span id="price-lite" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 4 000 ₽</span>
+                <span id="price-lite" class="text-3xl font-extrabold tracking-tight text-ink tabular-nums sm:text-4xl">от 4 000 ₽</span>
               </div>
 
               <ul class="mt-6 space-y-3 text-sm text-muted">
@@ -1498,14 +1604,14 @@
                 href="https://web.telegram.org/k/#@S4code_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
+                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink"
               >
                 <span>Написать в Telegram</span>
                 <span aria-hidden="true">→</span>
               </a>
               <a
                 href="#contact"
-                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-ink"
               >
                 Все контакты
               </a>
@@ -1516,7 +1622,7 @@
           <article class="spotlight-card flex flex-col justify-between rounded-2xl border border-border bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1" data-reveal="scale">
             <div>
               <div class="flex items-center justify-between gap-2">
-                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Быстрый лендинг</h3>
+                <h3 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Быстрый лендинг</h3>
                 <span class="rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
                   3–4 дня
                 </span>
@@ -1524,7 +1630,7 @@
 
               <!-- ЦЕНА ТАРИФА 2 -->
               <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
-                <span id="price-landing" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 8 000 ₽</span>
+                <span id="price-landing" class="text-3xl font-extrabold tracking-tight text-ink tabular-nums sm:text-4xl">от 8 000 ₽</span>
               </div>
 
               <ul class="mt-6 space-y-3 text-sm text-muted">
@@ -1552,14 +1658,14 @@
                 href="https://web.telegram.org/k/#@S4code_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
+                class="tg-bot-link btn-kinetic inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-bg px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink"
               >
                 <span>Написать в Telegram</span>
                 <span aria-hidden="true">→</span>
               </a>
               <a
                 href="#contact"
-                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-ink"
               >
                 Все контакты
               </a>
@@ -1570,7 +1676,7 @@
           <article class="spotlight-card relative flex flex-col justify-between rounded-2xl border border-accent bg-surface p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1 md:col-span-2 lg:col-span-1" data-reveal="scale">
             <div>
               <div class="flex items-center justify-between gap-2">
-                <h3 class="text-xl font-extrabold tracking-tight text-white sm:text-2xl lg:text-xl xl:text-2xl">Сайт для бизнеса</h3>
+                <h3 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl lg:text-xl xl:text-2xl">Сайт для бизнеса</h3>
                 <span class="shrink-0 whitespace-nowrap rounded-md border border-border bg-bg px-2.5 py-1 text-xs font-medium text-muted">
                   5–7 дней
                 </span>
@@ -1583,13 +1689,13 @@
 
               <!-- ЦЕНА ТАРИФА 3 -->
               <div class="mt-5 flex items-baseline gap-2 border-b border-border pb-5">
-                <span id="price-business" class="text-3xl font-extrabold tracking-tight text-white tabular-nums sm:text-4xl">от 13 000 ₽</span>
+                <span id="price-business" class="text-3xl font-extrabold tracking-tight text-ink tabular-nums sm:text-4xl">от 13 000 ₽</span>
               </div>
 
               <ul class="mt-6 space-y-3 text-sm text-muted">
                 <li class="flex items-start gap-3">
                   <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
-                  <span class="text-white">Расширенная структура под несколько направлений</span>
+                  <span class="text-ink">Расширенная структура под несколько направлений</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <span class="mt-0.5 text-accent" aria-hidden="true">✓</span>
@@ -1622,7 +1728,7 @@
               </a>
               <a
                 href="#contact"
-                class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-white"
+                class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-muted hover:text-ink"
               >
                 Все контакты
               </a>
@@ -1641,7 +1747,7 @@
 
         <div class="text-left sm:text-center" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Вопросы</p>
-          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Частые вопросы
           </h2>
         </div>
@@ -1652,10 +1758,10 @@
           <div class="faq-item" data-open="true">
             <button
               type="button"
-              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-ink/[0.03]"
               aria-expanded="true"
             >
-              <span class="text-base font-bold text-white sm:text-lg">Сколько стоит прототип?</span>
+              <span class="text-base font-bold text-ink sm:text-lg">Сколько стоит прототип?</span>
               <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
             </button>
             <div class="faq-content">
@@ -1671,10 +1777,10 @@
           <div class="faq-item" data-open="false">
             <button
               type="button"
-              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-ink/[0.03]"
               aria-expanded="false"
             >
-              <span class="text-base font-bold text-white sm:text-lg">Как происходит оплата?</span>
+              <span class="text-base font-bold text-ink sm:text-lg">Как происходит оплата?</span>
               <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
             </button>
             <div class="faq-content">
@@ -1690,10 +1796,10 @@
           <div class="faq-item" data-open="false">
             <button
               type="button"
-              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-ink/[0.03]"
               aria-expanded="false"
             >
-              <span class="text-base font-bold text-white sm:text-lg">Что нужно от меня для старта?</span>
+              <span class="text-base font-bold text-ink sm:text-lg">Что нужно от меня для старта?</span>
               <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
             </button>
             <div class="faq-content">
@@ -1709,10 +1815,10 @@
           <div class="faq-item" data-open="false">
             <button
               type="button"
-              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-ink/[0.03]"
               aria-expanded="false"
             >
-              <span class="text-base font-bold text-white sm:text-lg">Будет ли сайт нормально работать на телефоне?</span>
+              <span class="text-base font-bold text-ink sm:text-lg">Будет ли сайт нормально работать на телефоне?</span>
               <span class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-bg text-lg leading-none text-accent" aria-hidden="true">+</span>
             </button>
             <div class="faq-content">
@@ -1739,7 +1845,7 @@
           <!-- Левая часть: о связи со студией -->
           <div class="lg:col-span-5" data-reveal>
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Контакты</p>
-            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
               Пишите туда, где вам удобнее общаться
             </h2>
             <p class="mt-4 text-base leading-relaxed text-muted">
@@ -1772,7 +1878,7 @@
                   </div>
                   <span class="rounded-full bg-accent/15 px-2.5 py-1 text-[11px] font-semibold text-accent">Быстрее всего</span>
                 </div>
-                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Telegram-бот</h3>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-ink">Telegram-бот</h3>
                 <p class="mt-1.5 text-sm text-muted">
                   Короткий бриф, расчёт стоимости и живой диалог со студией.
                 </p>
@@ -1796,7 +1902,7 @@
                   </div>
                   <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Скоро</span>
                 </div>
-                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Профиль на Авито</h3>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-ink">Профиль на Авито</h3>
                 <p class="mt-1.5 text-sm text-muted">
                   Страница студии на Авито сейчас в процессе оформления — пока пишемся в Telegram и по почте.
                 </p>
@@ -1824,12 +1930,12 @@
                   </div>
                   <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Кейсы и новости</span>
                 </div>
-                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Telegram-канал</h3>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-ink">Telegram-канал</h3>
                 <p class="mt-1.5 text-sm text-muted">
                   Показываем свежие проекты, прототипы и закулисье разработки.
                 </p>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-white group-hover:text-accent transition-colors">
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-ink group-hover:text-accent transition-colors">
                 <span>@SF4CODE</span>
                 <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
               </div>
@@ -1852,12 +1958,12 @@
                   </div>
                   <span class="rounded-full border border-border bg-bg px-2.5 py-1 text-[11px] font-medium text-muted">Для ИП и компаний</span>
                 </div>
-                <h3 class="mt-5 text-lg font-bold tracking-tight text-white">Электронная почта</h3>
+                <h3 class="mt-5 text-lg font-bold tracking-tight text-ink">Электронная почта</h3>
                 <p class="mt-1.5 text-sm text-muted">
                   Для подробных ТЗ, реквизитов, счетов и коммерческих вопросов.
                 </p>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-white group-hover:text-accent transition-colors">
+              <div class="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm font-semibold text-ink group-hover:text-accent transition-colors">
                 <span id="email-contact-text" class="truncate">4codeteam@atomicmail.io</span>
                 <span class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
               </div>
@@ -1880,23 +1986,23 @@
 
         <div>
           <a href="#" class="inline-flex items-center text-xl font-extrabold tracking-tight">
-            <span class="text-accent">4</span><span class="text-white">CODE</span>
+            <span class="text-accent">4</span><span class="text-ink">CODE</span>
           </a>
           <p class="mt-2 text-xs text-muted">Сайты и лендинги с прототипом до оплаты</p>
         </div>
 
         <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted" aria-label="Навигация в подвале">
-          <a href="#about" class="transition-colors hover:text-white">О студии</a>
-          <a href="#cases" class="transition-colors hover:text-white">Примеры работ</a>
-          <a href="#pricing" class="transition-colors hover:text-white">Тарифы</a>
-          <a href="#contact" class="transition-colors hover:text-white">Контакты</a>
+          <a href="#about" class="transition-colors hover:text-ink">О студии</a>
+          <a href="#cases" class="transition-colors hover:text-ink">Примеры работ</a>
+          <a href="#pricing" class="transition-colors hover:text-ink">Тарифы</a>
+          <a href="#contact" class="transition-colors hover:text-ink">Контакты</a>
         </nav>
 
         <div class="flex flex-wrap items-center gap-4 text-sm">
           <button
             id="footer-email-btn"
             type="button"
-            class="text-muted transition-colors hover:text-white"
+            class="text-muted transition-colors hover:text-ink"
           >
             4codeteam@atomicmail.io
           </button>
@@ -1905,7 +2011,7 @@
             href="https://web.telegram.org/k/#@SF4CODE"
             target="_blank"
             rel="noopener noreferrer"
-            class="tg-channel-link text-muted transition-colors hover:text-white"
+            class="tg-channel-link text-muted transition-colors hover:text-ink"
           >
             Telegram-канал
           </a>
@@ -1946,15 +2052,15 @@
             </svg>
           </div>
           <div>
-            <h3 id="email-modal-title" class="text-lg font-bold text-white">Почта студии 4CODE</h3>
+            <h3 id="email-modal-title" class="text-lg font-bold text-ink">Почта студии 4CODE</h3>
             <p class="text-xs text-muted">Для ТЗ, реквизитов и коммерческих вопросов</p>
           </div>
         </div>
-        <button id="email-modal-close" type="button" class="text-muted hover:text-white" aria-label="Закрыть">✕</button>
+        <button id="email-modal-close" type="button" class="text-muted hover:text-ink" aria-label="Закрыть">✕</button>
       </div>
 
       <div class="mt-5 flex items-center justify-between gap-3 rounded-xl border border-border bg-bg px-4 py-3.5">
-        <code id="email-modal-value" class="text-sm font-semibold text-white select-all">4codeteam@atomicmail.io</code>
+        <code id="email-modal-value" class="text-sm font-semibold text-ink select-all">4codeteam@atomicmail.io</code>
         <span id="email-copied-badge" class="hidden text-xs font-semibold text-accent">✓ Скопировано</span>
       </div>
 
@@ -1969,7 +2075,7 @@
         <a
           id="email-mailto-link"
           href="mailto:4codeteam@atomicmail.io"
-          class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-muted"
+          class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-muted"
         >
           Открыть почту
         </a>
@@ -1987,11 +2093,11 @@
   >
     <div class="w-full max-w-md rounded-2xl border border-border bg-surface p-6 toast-pop">
       <div class="flex items-start justify-between gap-4">
-        <h3 id="demo-modal-title" class="text-lg font-bold text-white">Ссылка пока не подключена</h3>
-        <button id="demo-modal-close" type="button" class="text-muted hover:text-white" aria-label="Закрыть">✕</button>
+        <h3 id="demo-modal-title" class="text-lg font-bold text-ink">Ссылка пока не подключена</h3>
+        <button id="demo-modal-close" type="button" class="text-muted hover:text-ink" aria-label="Закрыть">✕</button>
       </div>
       <p class="mt-2.5 text-sm leading-relaxed text-muted">
-        Здесь стоит заглушка (<code id="demo-placeholder-name" class="text-white">#LINK</code>). Замените её в <code class="text-white">STUDIO_CONFIG</code> или напишите нам напрямую в Telegram-бота.
+        Здесь стоит заглушка (<code id="demo-placeholder-name" class="text-ink">#LINK</code>). Замените её в <code class="text-ink">STUDIO_CONFIG</code> или напишите нам напрямую в Telegram-бота.
       </p>
       <div class="mt-5 flex gap-3">
         <a
@@ -2006,7 +2112,7 @@
         <button
           id="demo-modal-cancel"
           type="button"
-          class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-muted"
+          class="inline-flex items-center justify-center rounded-lg border border-border bg-bg px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-muted"
         >
           Закрыть
         </button>
@@ -2052,6 +2158,7 @@
     const HAS_FINE_POINTER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
     document.addEventListener('DOMContentLoaded', () => {
+      initThemeSwitcher();
       applyStudioConfig();
       initScrollProgress();
       initRevealChoreography();
@@ -2073,6 +2180,49 @@
         document.querySelectorAll('.hero-mask-line').forEach((el) => el.classList.add('is-settled'));
       }, 1300);
     });
+
+    /**
+     * Переключатель Светлой / Тёмной / Системной темы
+     */
+    function initThemeSwitcher() {
+      const mql = window.matchMedia('(prefers-color-scheme: dark)');
+      const buttons = document.querySelectorAll('[data-theme-set]');
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+      const applyTheme = (mode) => {
+        if (mode !== 'light' && mode !== 'dark' && mode !== 'system') mode = 'system';
+        const resolved = mode === 'system' ? (mql.matches ? 'dark' : 'light') : mode;
+        document.documentElement.dataset.themeMode = mode;
+        document.documentElement.dataset.theme = resolved;
+        if (metaTheme) {
+          metaTheme.setAttribute('content', resolved === 'dark' ? '#0E0E10' : '#F7F7F8');
+        }
+        buttons.forEach((btn) => {
+          btn.setAttribute('aria-pressed', btn.dataset.themeSet === mode ? 'true' : 'false');
+        });
+        try {
+          localStorage.setItem('4code-theme', mode);
+        } catch (e) {}
+      };
+
+      const initial = document.documentElement.dataset.themeMode || 'system';
+      applyTheme(initial);
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => applyTheme(btn.dataset.themeSet));
+      });
+
+      const onSystemChange = () => {
+        if ((document.documentElement.dataset.themeMode || 'system') === 'system') {
+          applyTheme('system');
+        }
+      };
+      if (mql.addEventListener) {
+        mql.addEventListener('change', onSystemChange);
+      } else if (mql.addListener) {
+        mql.addListener(onSystemChange);
+      }
+    }
 
     /**
      * Плавная анимация числовых значений (например, в калькуляторе макета)
