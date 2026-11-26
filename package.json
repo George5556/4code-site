@@ -1,0 +1,14 @@
+{
+  "name": "4code-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "4CODE landing page",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/tailwind.css -o ./assets/tailwind.css --watch",
+    "serve": "node scripts/serve.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

@@ -2,3 +2,4 @@ demos/
 .DS_Store
 Thumbs.db
 backups/
+node_modules/
